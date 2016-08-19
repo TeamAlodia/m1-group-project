@@ -95,6 +95,6 @@ $(document).ready(function() {
       buildLevel();
       drawLevel();
     }
-    $("#crypto_form")[0].reset();
+    $("#console_form")[0].reset();
   })
 })
