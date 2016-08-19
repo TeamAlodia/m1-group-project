@@ -10,8 +10,9 @@
     <title></title>
   </head>
   <body>
-    <button id="start_button" class="btn btn-danger">Wake up</button>
-    <div>
+    <!-- <button id="start_button" class="btn btn-danger">Wake up</button> -->
+    <div class="container">
+      <!-- Map -->
       <div class="row">
         <div id="0-0" class="col-xs-1">
 
@@ -219,6 +220,12 @@
         <div id="8-8" class="col-xs-1">
         </div>
       </div>
+      <!-- End map -->
     </div>
+    <!-- User input form -->
+    <form id="console_form" class="form-group">
+      <input id="console_input" required input type="text" autofocus="autofocus" placeholder="Type 'wake up' to begin" class="form-control"></input>
+    </form>
+    <!-- End form -->
   </body>
 </html>
