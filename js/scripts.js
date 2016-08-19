@@ -15,9 +15,6 @@ var Room = function() {
 }
 
 function movePlayer(direction) {
-  if(){
-
-  }
 }
 
 //Draws the level, the doors and the player. Will eventually only draw seen rooms.
