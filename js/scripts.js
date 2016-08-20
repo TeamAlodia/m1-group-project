@@ -15,38 +15,39 @@ var Room = function() {
   this.doorW = "*";
   this.doorResult = "";
   this.playerLocation = " ";
+  this.seenRoom = false;
 }
 
 // Returns true if there is a door and it is either unlocked, or locked and the player has a key
 function checkIfPassable(checkY, checkX) {
-  if(checkY === -1 && firstFloor[playerY][playerX].doorN != "*"){
-    if(firstFloor[playerY + checkY][playerX].doorS != "*"){
+  if(checkY === -1 && firstFloor[playerY][playerX].doorN === "|"){
+    if(firstFloor[playerY + checkY][playerX].doorS === "|"){
       return true;
-    }else if(keys>0){
+    }else if(firstFloor[playerY + checkY][playerX].doorS === "-" && keys>0){
       firstFloor[playerY + checkY][playerX].doorS = "|";
       keys -=1;
       return true;
     }
-  }else if(checkY === +1 && firstFloor[playerY][playerX].doorS != "*"){
-    if(firstFloor[playerY + checkY][playerX].doorN != "*"){
+  }else if(checkY === +1 && firstFloor[playerY][playerX].doorS === "|"){
+    if(firstFloor[playerY + checkY][playerX].doorN === "|"){
       return true;
-    }else if(keys>0){
+    }else if(firstFloor[playerY + checkY][playerX].doorN === "-" && keys>0){
       firstFloor[playerY + checkY][playerX].doorN = "|";
       keys -=1;
       return true;
     }
-  }else if(checkX === +1 && firstFloor[playerY][playerX].doorE != "*"){
-    if(firstFloor[playerY][playerX + checkX].doorW != "*"){
+  }else if(checkX === +1 && firstFloor[playerY][playerX].doorE === "-"){
+    if(firstFloor[playerY][playerX + checkX].doorW === "-"){
       return true;
-    }else if(keys>0){
+    }else if(firstFloor[playerY][playerX + checkX].doorW === "|" && keys>0){
       firstFloor[playerY][playerX + checkX].doorW = "-";
       keys -=1;
       return true;
     }
-  }else if(checkX === -1 && firstFloor[playerY][playerX].doorW != "*"){
-    if(firstFloor[playerY][playerX + checkX].doorE != "*"){
+  }else if(checkX === -1 && firstFloor[playerY][playerX].doorW === "-"){
+    if(firstFloor[playerY][playerX + checkX].doorE === "-"){
       return true;
-    }else if(keys>0){
+    }else if(firstFloor[playerY][playerX + checkX].doorE === "|" && keys>0){
       firstFloor[playerY][playerX + checkX].doorE = "-";
       keys -=1;
       return true;
@@ -62,25 +63,30 @@ function movePlayer(direction) {
     if(checkIfPassable(-1,0)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerY -= 1;
+      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }else if(direction === "s"){
     if(checkIfPassable(+1,0)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerY += 1;
+      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }else if(direction === "e"){
     if(checkIfPassable(0,+1)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerX += 1;
+      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }else if(direction === "w"){
     if(checkIfPassable(0,-1)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerX -= 1;
+      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }
 
   firstFloor[playerY][playerX].playerLocation = "@";
+  firstFloor[playerY][playerX].seenRoom = true;
   $("span").remove();
   drawLevel();
 }
@@ -95,9 +101,10 @@ function playerConsole(userInput) {
 function drawLevel() {
   for(var y = 0; y < yAxisLength; ++y){
     for(var x = 0; x < xAxisLength; ++x){
-
-      $("#" + y + "-" + x).append("<span>**" + firstFloor[y][x].doorN + "**<br>*&nbsp;&nbsp;&nbsp;*<br>" + firstFloor[y][x].doorW + "&nbsp" + firstFloor[y][x].playerLocation + "&nbsp;" + firstFloor[y][x].doorE + "<br>*&nbsp;&nbsp;&nbsp;*<br>**" + firstFloor[y][x].doorS + "**</span>");
-
+      if(firstFloor[y][x].seenRoom){
+        $("#" + y + "-" + x).append("<span>**" + firstFloor[y][x].doorN + "**<br>*&nbsp;&nbsp;&nbsp;*<br>" + firstFloor[y][x].doorW + "&nbsp" + firstFloor[y][x].playerLocation + "&nbsp;" + firstFloor[y][x].doorE + "<br>*&nbsp;&nbsp;&nbsp;*<br>**" + firstFloor[y][x].doorS + "**</span>");
+      }else{$("#" + y + "-" + x).append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>")
+      }
     }
   }
 }
@@ -112,7 +119,7 @@ function buildLevel() {
     }
   }
 
-//Populates doors
+//Populates doors. Currently split into separate loops to maintain flexibility. Will eventually be compressed.
   for(var y = 0; y < yAxisLength; ++y){
     for(var x = 0; x < xAxisLength; ++x){
       var doorChance = (Math.floor(Math.random() * (13 - 1)) + 1);
@@ -132,18 +139,39 @@ function buildLevel() {
     }
   }
 
+  //Takes doorResult and uses it to add the data to the room objects, including locked doors.
   for(var y = 0; y < yAxisLength; ++y){
     for(var x = 0; x < xAxisLength; ++x){
 
       firstFloor[y][x].doorResult.forEach(function(currentDoor) {
         if(currentDoor === "n"){
           firstFloor[y][x].doorN = "|";
+          if(y !== 0){
+            if(firstFloor[y-1][x].doorS === "*"){
+              firstFloor[y-1][x].doorS = "-";
+            }
+          }
         }else if(currentDoor === "s"){
           firstFloor[y][x].doorS = "|";
+          if(y !== 8){
+            if(firstFloor[y+1][x].doorN === "*"){
+              firstFloor[y+1][x].doorN = "-";
+            }
+          }
         }else if(currentDoor === "e"){
           firstFloor[y][x].doorE = "-";
+          if(x !== 8){
+            if(firstFloor[y][x+1].doorW === "*"){
+              firstFloor[y][x+1].doorW = "|";
+            }
+          }
         }else{
           firstFloor[y][x].doorW = "-"
+          if(x !== 0){
+            if(firstFloor[y][x-1].doorE === "*"){
+              firstFloor[y][x-1].doorE = "|";
+            }
+          }
         }
       })
 
@@ -167,6 +195,7 @@ function buildLevel() {
 
   //Sets player origin. Currently static.
   firstFloor[4][4].playerLocation = "@";
+  firstFloor[4][4].seenRoom = true;
 }
 
 $(document).ready(function() {
