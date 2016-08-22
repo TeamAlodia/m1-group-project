@@ -4,6 +4,10 @@ body{
   color: #00e600;
 }
 
+.form-control{
+
+}
+
 .col-xs-1{
   width: auto;
   line-height: 10px;

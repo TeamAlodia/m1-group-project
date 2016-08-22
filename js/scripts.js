@@ -5,6 +5,11 @@ var yAxisLength = 9;
 var firstFloor = [];
 var playerCoords = [4,4]
 var keys = 99;
+var batteries = 0;
+var flashlightPower = 100;
+var flashlightMeter = "";
+var sanity = 100;
+var sanityMeter="";
 var playerY = 4;
 var playerX = 4;
 
@@ -16,6 +21,7 @@ var Room = function() {
   this.doorResult = "";
   this.playerLocation = " ";
   this.seenRoom = false;
+  this.lightLevel = "";
 }
 
 // Returns true if there is a door and it is either unlocked, or locked and the player has a key
@@ -63,32 +69,28 @@ function movePlayer(direction) {
     if(checkIfPassable(-1,0)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerY -= 1;
-      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }else if(direction === "s"){
     if(checkIfPassable(+1,0)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerY += 1;
-      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }else if(direction === "e"){
     if(checkIfPassable(0,+1)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerX += 1;
-      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }else if(direction === "w"){
     if(checkIfPassable(0,-1)){
       firstFloor[playerY][playerX].playerLocation = " ";
       playerX -= 1;
-      // firstFloor[playerY][playerX].seenRoom = true;
     }
   }
 
   firstFloor[playerY][playerX].playerLocation = "@";
   firstFloor[playerY][playerX].seenRoom = true;
   $("span").remove();
-  drawLevel();
+  drawLevel(false);
 }
 
 function playerConsole(userInput) {
@@ -98,12 +100,13 @@ function playerConsole(userInput) {
 }
 
 //Draws the level, the doors and the player. Will eventually only draw seen rooms.
-function drawLevel() {
+function drawLevel(initialDraw) {
   for(var y = 0; y < yAxisLength; ++y){
     for(var x = 0; x < xAxisLength; ++x){
-      if(firstFloor[y][x].seenRoom){
+      if(firstFloor[y][x].seenRoom && initialDraw === false){
         $("#" + y + "-" + x).append("<span>**" + firstFloor[y][x].doorN + "**<br>*&nbsp;&nbsp;&nbsp;*<br>" + firstFloor[y][x].doorW + "&nbsp" + firstFloor[y][x].playerLocation + "&nbsp;" + firstFloor[y][x].doorE + "<br>*&nbsp;&nbsp;&nbsp;*<br>**" + firstFloor[y][x].doorS + "**</span>");
-      }else{$("#" + y + "-" + x).append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>")
+      }else if(firstFloor[y][x].seenRoom === false || initialDraw){
+        $("#" + y + "-" + x).append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>")
       }
     }
   }
@@ -198,16 +201,61 @@ function buildLevel() {
   firstFloor[4][4].seenRoom = true;
 }
 
+function findLightLevel() {
+  var lightChance = (Math.floor(Math.random() * (100 - 1)) + 1);
+
+  if(lightChance >= 1 && lightChance <= 20){
+    firstFloor[playerY][playerX].lightLevel = "dark";
+  }else if(lightChance >= 21 && lightChance <= 40){
+    firstFloor[playerY][playerX].lightLevel = "flickering";
+  }else if(lightChance >= 41 && lightChance <= 80){
+    firstFloor[playerY][playerX].lightLevel = "dim";
+  }else{
+    firstFloor[playerY][playerX].lightLevel = "bright";
+  }
+
+}
+
+function drawHUD(expoOutput) {
+  $("#HUD_expo_output").text(expoOutput);
+  $("#HUD_light_output").text("The light here is " + firstFloor[playerY][playerX].lightLevel);
+  $("#HUD_keys_output").text("Keys: " + keys);
+  $("#HUD_batteries_output").text("Batteries: " + batteries);
+
+  flashlightMeter = "";
+  for(var i = 1; i <= flashlightPower/5; ++i){
+    flashlightMeter += "/";
+  }
+  if(flashlightPower/5 <=4){
+    $("#HUD_flashlight_output").css("color", "red");
+  }else{
+    $("#HUD_flashlight_output").css("color", "#00e600");
+  }
+  $("#HUD_flashlight_output").text("Flashlight: " + flashlightMeter);
+
+  sanityMeter = "";
+  for(var i = 1; i <= sanity/5; ++i){
+    sanityMeter += "/";
+  }
+  if(sanity/5 <=4){
+    $("#HUD_sanity_output").css("color", "red");
+  }else{
+    $("#HUD_sanity_output").css("color", "#00e600");
+  }
+  $("#HUD_sanity_output").text("Sanity: " + sanityMeter);
+}
+
 $(document).ready(function() {
 
   //Submit behavior for user input form
   $("#console_form").submit(function(event) {
     event.preventDefault();
     var userInput = $("#console_input").val().toLowerCase();
-
     if(userInput === "wake up"){
       buildLevel();
-      drawLevel();
+      drawLevel(false);
+      findLightLevel();
+      drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
     }
 
     playerConsole(userInput);
