@@ -2,6 +2,12 @@ body{
   font-family: VT323;
   background-color: black;
   color: #00e600;
+  /*Justin's Styling*/
+  line-height: 15px;
+}
+
+#player_span {
+  color: white;
 }
 
 .form-control{
