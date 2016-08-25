@@ -41,37 +41,36 @@ Room.prototype.findLightLevel = function() {
   }
 }
 
-// Returns true if there is a door and it is either unlocked, or locked and the player has a key
-function checkIfPassable(checkY, checkX) {
-  if(checkY === -1 && vaultArray[currentVault].floor[playerY][playerX].doorN === "|"){
-    if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorS === "|"){
+Vault.prototype.checkIfPassable = function(checkY, checkX) {
+  if(checkY === -1 && this.floor[playerY][playerX].doorN === "|"){
+    if(this.floor[playerY + checkY][playerX].doorS === "|"){
       return true;
-    }else if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorS === "-" && keys>0){
-      vaultArray[currentVault].floor[playerY + checkY][playerX].doorS = "|";
+    }else if(this.floor[playerY + checkY][playerX].doorS === "-" && keys>0){
+      this.floor[playerY + checkY][playerX].doorS = "|";
       keys -=1;
       return true;
     }
-  }else if(checkY === +1 && vaultArray[currentVault].floor[playerY][playerX].doorS === "|"){
-    if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorN === "|"){
+  }else if(checkY === +1 && this.floor[playerY][playerX].doorS === "|"){
+    if(this.floor[playerY + checkY][playerX].doorN === "|"){
       return true;
-    }else if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorN === "-" && keys>0){
-      vaultArray[currentVault].floor[playerY + checkY][playerX].doorN = "|";
+    }else if(this.floor[playerY + checkY][playerX].doorN === "-" && keys>0){
+      this.floor[playerY + checkY][playerX].doorN = "|";
       keys -=1;
       return true;
     }
-  }else if(checkX === +1 && vaultArray[currentVault].floor[playerY][playerX].doorE === "-"){
-    if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorW === "-"){
+  }else if(checkX === +1 && this.floor[playerY][playerX].doorE === "-"){
+    if(this.floor[playerY][playerX + checkX].doorW === "-"){
       return true;
-    }else if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorW === "|" && keys>0){
-      vaultArray[currentVault].floor[playerY][playerX + checkX].doorW = "-";
+    }else if(this.floor[playerY][playerX + checkX].doorW === "|" && keys>0){
+      this.floor[playerY][playerX + checkX].doorW = "-";
       keys -=1;
       return true;
     }
-  }else if(checkX === -1 && vaultArray[currentVault].floor[playerY][playerX].doorW === "-"){
-    if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorE === "-"){
+  }else if(checkX === -1 && this.floor[playerY][playerX].doorW === "-"){
+    if(this.floor[playerY][playerX + checkX].doorE === "-"){
       return true;
-    }else if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorE === "|" && keys>0){
-      vaultArray[currentVault].floor[playerY][playerX + checkX].doorE = "-";
+    }else if(this.floor[playerY][playerX + checkX].doorE === "|" && keys>0){
+      this.floor[playerY][playerX + checkX].doorE = "-";
       keys -=1;
       return true;
     }
@@ -83,22 +82,22 @@ function checkIfPassable(checkY, checkX) {
 function movePlayer(direction) {
 
   if(direction === "n"){
-    if(checkIfPassable(-1,0)){
+    if(vaultArray[currentVault].checkIfPassable(-1,0)){
       vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerY -= 1;
     }
   }else if(direction === "s"){
-    if(checkIfPassable(+1,0)){
+    if(vaultArray[currentVault].checkIfPassable(+1,0)){
       vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerY += 1;
     }
   }else if(direction === "e"){
-    if(checkIfPassable(0,+1)){
+    if(vaultArray[currentVault].checkIfPassable(0,+1)){
       vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerX += 1;
     }
   }else if(direction === "w"){
-    if(checkIfPassable(0,-1)){
+    if(vaultArray[currentVault].checkIfPassable(0,-1)){
       vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerX -= 1;
     }
