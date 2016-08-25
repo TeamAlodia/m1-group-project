@@ -2,7 +2,7 @@
 
 var xAxisLength = 9;
 var yAxisLength = 9;
-var firstFloor = [];
+// var firstFloor = [];
 var keys = 99;
 var batteries = 0;
 var flashlightPower = 100;
@@ -11,8 +11,13 @@ var sanity = 100;
 var sanityMeter="";
 var playerY = 4;
 var playerX = 4;
-var roomMap = [];
-// var roomStructure = ["<span>**" + firstFloor[y][x].doorN + "**",]
+var vaultArray = [];
+
+// vaultArray[0].floor[y][x]
+
+var Vault = function() {
+  this.floor = [];
+}
 
 var Room = function() {
   this.doorN = "*";
@@ -27,35 +32,35 @@ var Room = function() {
 
 // Returns true if there is a door and it is either unlocked, or locked and the player has a key
 function checkIfPassable(checkY, checkX) {
-  if(checkY === -1 && firstFloor[playerY][playerX].doorN === "|"){
-    if(firstFloor[playerY + checkY][playerX].doorS === "|"){
+  if(checkY === -1 && vaultArray[0].floor[playerY][playerX].doorN === "|"){
+    if(vaultArray[0].floor[playerY + checkY][playerX].doorS === "|"){
       return true;
-    }else if(firstFloor[playerY + checkY][playerX].doorS === "-" && keys>0){
-      firstFloor[playerY + checkY][playerX].doorS = "|";
+    }else if(vaultArray[0].floor[playerY + checkY][playerX].doorS === "-" && keys>0){
+      vaultArray[0].floor[playerY + checkY][playerX].doorS = "|";
       keys -=1;
       return true;
     }
-  }else if(checkY === +1 && firstFloor[playerY][playerX].doorS === "|"){
-    if(firstFloor[playerY + checkY][playerX].doorN === "|"){
+  }else if(checkY === +1 && vaultArray[0].floor[playerY][playerX].doorS === "|"){
+    if(vaultArray[0].floor[playerY + checkY][playerX].doorN === "|"){
       return true;
-    }else if(firstFloor[playerY + checkY][playerX].doorN === "-" && keys>0){
-      firstFloor[playerY + checkY][playerX].doorN = "|";
+    }else if(vaultArray[0].floor[playerY + checkY][playerX].doorN === "-" && keys>0){
+      vaultArray[0].floor[playerY + checkY][playerX].doorN = "|";
       keys -=1;
       return true;
     }
-  }else if(checkX === +1 && firstFloor[playerY][playerX].doorE === "-"){
-    if(firstFloor[playerY][playerX + checkX].doorW === "-"){
+  }else if(checkX === +1 && vaultArray[0].floor[playerY][playerX].doorE === "-"){
+    if(vaultArray[0].floor[playerY][playerX + checkX].doorW === "-"){
       return true;
-    }else if(firstFloor[playerY][playerX + checkX].doorW === "|" && keys>0){
-      firstFloor[playerY][playerX + checkX].doorW = "-";
+    }else if(vaultArray[0].floor[playerY][playerX + checkX].doorW === "|" && keys>0){
+      vaultArray[0].floor[playerY][playerX + checkX].doorW = "-";
       keys -=1;
       return true;
     }
-  }else if(checkX === -1 && firstFloor[playerY][playerX].doorW === "-"){
-    if(firstFloor[playerY][playerX + checkX].doorE === "-"){
+  }else if(checkX === -1 && vaultArray[0].floor[playerY][playerX].doorW === "-"){
+    if(vaultArray[0].floor[playerY][playerX + checkX].doorE === "-"){
       return true;
-    }else if(firstFloor[playerY][playerX + checkX].doorE === "|" && keys>0){
-      firstFloor[playerY][playerX + checkX].doorE = "-";
+    }else if(vaultArray[0].floor[playerY][playerX + checkX].doorE === "|" && keys>0){
+      vaultArray[0].floor[playerY][playerX + checkX].doorE = "-";
       keys -=1;
       return true;
     }
@@ -68,30 +73,31 @@ function movePlayer(direction) {
 
   if(direction === "n"){
     if(checkIfPassable(-1,0)){
-      firstFloor[playerY][playerX].playerLocation = " ";
+      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
       playerY -= 1;
     }
   }else if(direction === "s"){
     if(checkIfPassable(+1,0)){
-      firstFloor[playerY][playerX].playerLocation = " ";
+      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
       playerY += 1;
     }
   }else if(direction === "e"){
     if(checkIfPassable(0,+1)){
-      firstFloor[playerY][playerX].playerLocation = " ";
+      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
       playerX += 1;
     }
   }else if(direction === "w"){
     if(checkIfPassable(0,-1)){
-      firstFloor[playerY][playerX].playerLocation = " ";
+      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
       playerX -= 1;
     }
   }
 
-  firstFloor[playerY][playerX].playerLocation = "@";
-  firstFloor[playerY][playerX].seenRoom = true;
+  vaultArray[0].floor[playerY][playerX].playerLocation = "@";
+  vaultArray[0].floor[playerY][playerX].seenRoom = true;
   $("span").remove();
-  drawLevel(false);
+
+  drawVault();
 }
 
 function playerConsole(userInput) {
@@ -101,30 +107,20 @@ function playerConsole(userInput) {
 }
 
 //Draws the level, the doors and the player. Will eventually only draw seen rooms.
-function drawLevel(initialDraw) {
-  // for(var y = 0; y < yAxisLength; ++y){
-  //   for(var x = 0; x < xAxisLength; ++x){
-  //     if(firstFloor[y][x].seenRoom && initialDraw === false){
-  //       $("#" + y + "-" + x).append("<span>**" + firstFloor[y][x].doorN + "**<br>*&nbsp;&nbsp;&nbsp;*<br>" + firstFloor[y][x].doorW + "&nbsp" + firstFloor[y][x].playerLocation + "&nbsp;" + firstFloor[y][x].doorE + "<br>*&nbsp;&nbsp;&nbsp;*<br>**" + firstFloor[y][x].doorS + "**</span>");
-  //     }else if(firstFloor[y][x].seenRoom === false || initialDraw){
-  //       $("#" + y + "-" + x).append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>")
-  //     }
-  //   }
-  // }
-
+function drawVault() {
   $("span").remove();
   $("br").remove();
 
   for(var y = 0; y < yAxisLength; ++y){
     for(var i = 1; i < 6 ; ++i){
       for(var x = 0; x < xAxisLength; ++x){
-        if(firstFloor[y][x].seenRoom){
+        if(vaultArray[0].floor[y][x].seenRoom){
           if(i === 1){
-            $("#main_con").append("<span>**" + "<span id=door_span>" + firstFloor[y][x].doorN + "</span>" + "**</span>");
+            $("#main_con").append("<span>**" + "<span id=door_span>" + vaultArray[0].floor[y][x].doorN + "</span>" + "**</span>");
           }else if(i === 3){
-            $("#main_con").append( "<span><span id=door_span>" + firstFloor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + firstFloor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + firstFloor[y][x].doorE + "</span></span>");
+            $("#main_con").append( "<span><span id=door_span>" + vaultArray[0].floor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + vaultArray[0].floor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + vaultArray[0].floor[y][x].doorE + "</span></span>");
           }else if (i === 5){
-            $("#main_con").append("<span>**" +  "<span id=door_span>" + firstFloor[y][x].doorS + "</span>" + "**</span>");
+            $("#main_con").append("<span>**" +  "<span id=door_span>" + vaultArray[0].floor[y][x].doorS + "</span>" + "**</span>");
           }else{
             $("#main_con").append("<span>*&nbsp;&nbsp;&nbsp;*</span>");
           }
@@ -138,31 +134,17 @@ function drawLevel(initialDraw) {
 
 }
 
-function buildLevel() {
+function buildVault() {
   //Builds empty floor
 
+  vaultArray[0] = new Vault;
+
   for(var y = 0; y < yAxisLength; ++y){
-    firstFloor[y] = [];
+    vaultArray[0].floor[y] = [];
     for(var x = 0; x < xAxisLength; ++x){
-      firstFloor[y][x] = new Room;
+      vaultArray[0].floor[y][x] = new Room;
     }
   }
-
-  //Builds map
-
-  // roomMap += [];
-  //
-  // for(var y = 0; y < yAxisLength; ++y){
-  //   for(var i = 0; i < 5 ; ++i){
-  //     for(var x = 0; x < xAxisLength; ++x){
-  //       if(i === 0){
-  //         roomMap.lastIndexOf
-  //       }
-  //     }
-  //     $("#main_con").append("<br>");
-  //   }
-  // }
-
 
 //Populates doors. Currently split into separate loops to maintain flexibility. Will eventually be compressed.
   for(var y = 0; y < yAxisLength; ++y){
@@ -173,48 +155,49 @@ function buildLevel() {
       var threeDoors = ["nse","nsw","nwe","swe"]
 
       if(doorChance >= 1 && doorChance <= 4){
-        firstFloor[y][x].doorResult = oneDoor[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
+        vaultArray[0].floor[y][x].doorResult = oneDoor[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
       }else if(doorChance >= 5 && doorChance <= 8){
-        firstFloor[y][x].doorResult = twoDoors[(Math.floor(Math.random() * (6 - 0)) + 0)].split("");
+        vaultArray[0].floor[y][x].doorResult = twoDoors[(Math.floor(Math.random() * (6 - 0)) + 0)].split("");
       }else if(doorChance >=9 && doorChance <= 11){
-        firstFloor[y][x].doorResult = threeDoors[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
+        vaultArray[0].floor[y][x].doorResult = threeDoors[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
       }else{
-        firstFloor[y][x].doorResult = ["n","s","e","w"];
+        vaultArray[0].floor[y][x].doorResult = ["n","s","e","w"];
       }
     }
   }
+
 
   //Takes doorResult and uses it to add the data to the room objects, including locked doors.
   for(var y = 0; y < yAxisLength; ++y){
     for(var x = 0; x < xAxisLength; ++x){
 
-      firstFloor[y][x].doorResult.forEach(function(currentDoor) {
+      vaultArray[0].floor[y][x].doorResult.forEach(function(currentDoor) {
         if(currentDoor === "n"){
-          firstFloor[y][x].doorN = "|";
+          vaultArray[0].floor[y][x].doorN = "|";
           if(y !== 0){
-            if(firstFloor[y-1][x].doorS === "*"){
-              firstFloor[y-1][x].doorS = "-";
+            if(vaultArray[0].floor[y-1][x].doorS === "*"){
+              vaultArray[0].floor[y-1][x].doorS = "-";
             }
           }
         }else if(currentDoor === "s"){
-          firstFloor[y][x].doorS = "|";
+          vaultArray[0].floor[y][x].doorS = "|";
           if(y !== 8){
-            if(firstFloor[y+1][x].doorN === "*"){
-              firstFloor[y+1][x].doorN = "-";
+            if(vaultArray[0].floor[y+1][x].doorN === "*"){
+              vaultArray[0].floor[y+1][x].doorN = "-";
             }
           }
         }else if(currentDoor === "e"){
-          firstFloor[y][x].doorE = "-";
+          vaultArray[0].floor[y][x].doorE = "-";
           if(x !== 8){
-            if(firstFloor[y][x+1].doorW === "*"){
-              firstFloor[y][x+1].doorW = "|";
+            if(vaultArray[0].floor[y][x+1].doorW === "*"){
+              vaultArray[0].floor[y][x+1].doorW = "|";
             }
           }
         }else{
-          firstFloor[y][x].doorW = "-"
+          vaultArray[0].floor[y][x].doorW = "-"
           if(x !== 0){
-            if(firstFloor[y][x-1].doorE === "*"){
-              firstFloor[y][x-1].doorE = "|";
+            if(vaultArray[0].floor[y][x-1].doorE === "*"){
+              vaultArray[0].floor[y][x-1].doorE = "|";
             }
           }
         }
@@ -222,16 +205,16 @@ function buildLevel() {
 
       // // Clears doors from edges of map
       if(y === 0){
-        firstFloor[y][x].doorN = "*";
+        vaultArray[0].floor[y][x].doorN = "*";
       }
       if(x === 0){
-        firstFloor[y][x].doorW = "*";
+        vaultArray[0].floor[y][x].doorW = "*";
       }
       if(y === 8){
-        firstFloor[y][x].doorS = "*";
+        vaultArray[0].floor[y][x].doorS = "*";
       }
       if(x === 8){
-        firstFloor[y][x].doorE = "*";
+        vaultArray[0].floor[y][x].doorE = "*";
       }
     }
   }
@@ -239,21 +222,21 @@ function buildLevel() {
   $("#console_input").attr("placeholder", "> (type 'help' for instructions)")
 
   //Sets player origin. Currently static.
-  firstFloor[4][4].playerLocation = "@";
-  firstFloor[4][4].seenRoom = true;
+  vaultArray[0].floor[4][4].playerLocation = "@";
+  vaultArray[0].floor[4][4].seenRoom = true;
 }
 
 function findLightLevel() {
   var lightChance = (Math.floor(Math.random() * (100 - 1)) + 1);
 
   if(lightChance >= 1 && lightChance <= 20){
-    firstFloor[playerY][playerX].lightLevel = "dark";
+    vaultArray[0].floor[playerY][playerX].lightLevel = "dark";
   }else if(lightChance >= 21 && lightChance <= 40){
-    firstFloor[playerY][playerX].lightLevel = "flickering";
+    vaultArray[0].floor[playerY][playerX].lightLevel = "flickering";
   }else if(lightChance >= 41 && lightChance <= 80){
-    firstFloor[playerY][playerX].lightLevel = "dim";
+    vaultArray[0].floor[playerY][playerX].lightLevel = "dim";
   }else{
-    firstFloor[playerY][playerX].lightLevel = "bright";
+    vaultArray[0].floor[playerY][playerX].lightLevel = "bright";
   }
 
 }
@@ -294,8 +277,8 @@ $(document).ready(function() {
     event.preventDefault();
     var userInput = $("#console_input").val().toLowerCase();
     if(userInput === "wake up"){
-      buildLevel();
-      drawLevel(false);
+      buildVault();
+      drawVault();
       findLightLevel();
       // drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
     }
