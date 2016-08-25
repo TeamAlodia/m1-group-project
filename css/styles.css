@@ -2,6 +2,15 @@ body{
   font-family: VT323;
   background-color: black;
   color: #00e600;
+  line-height: 10px;
+}
+
+#player_span{
+  color: white;
+}
+
+#door_span{
+  color: green;
 }
 
 .form-control{

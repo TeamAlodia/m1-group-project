@@ -3,7 +3,6 @@
 var xAxisLength = 9;
 var yAxisLength = 9;
 var firstFloor = [];
-var playerCoords = [4,4]
 var keys = 99;
 var batteries = 0;
 var flashlightPower = 100;
@@ -12,6 +11,8 @@ var sanity = 100;
 var sanityMeter="";
 var playerY = 4;
 var playerX = 4;
+var roomMap = [];
+// var roomStructure = ["<span>**" + firstFloor[y][x].doorN + "**",]
 
 var Room = function() {
   this.doorN = "*";
@@ -101,15 +102,40 @@ function playerConsole(userInput) {
 
 //Draws the level, the doors and the player. Will eventually only draw seen rooms.
 function drawLevel(initialDraw) {
+  // for(var y = 0; y < yAxisLength; ++y){
+  //   for(var x = 0; x < xAxisLength; ++x){
+  //     if(firstFloor[y][x].seenRoom && initialDraw === false){
+  //       $("#" + y + "-" + x).append("<span>**" + firstFloor[y][x].doorN + "**<br>*&nbsp;&nbsp;&nbsp;*<br>" + firstFloor[y][x].doorW + "&nbsp" + firstFloor[y][x].playerLocation + "&nbsp;" + firstFloor[y][x].doorE + "<br>*&nbsp;&nbsp;&nbsp;*<br>**" + firstFloor[y][x].doorS + "**</span>");
+  //     }else if(firstFloor[y][x].seenRoom === false || initialDraw){
+  //       $("#" + y + "-" + x).append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>")
+  //     }
+  //   }
+  // }
+
+  $("span").remove();
+  $("br").remove();
+
   for(var y = 0; y < yAxisLength; ++y){
-    for(var x = 0; x < xAxisLength; ++x){
-      if(firstFloor[y][x].seenRoom && initialDraw === false){
-        $("#" + y + "-" + x).append("<span>**" + firstFloor[y][x].doorN + "**<br>*&nbsp;&nbsp;&nbsp;*<br>" + firstFloor[y][x].doorW + "&nbsp" + firstFloor[y][x].playerLocation + "&nbsp;" + firstFloor[y][x].doorE + "<br>*&nbsp;&nbsp;&nbsp;*<br>**" + firstFloor[y][x].doorS + "**</span>");
-      }else if(firstFloor[y][x].seenRoom === false || initialDraw){
-        $("#" + y + "-" + x).append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>")
+    for(var i = 1; i < 6 ; ++i){
+      for(var x = 0; x < xAxisLength; ++x){
+        if(firstFloor[y][x].seenRoom){
+          if(i === 1){
+            $("#main_con").append("<span>**" + "<span id=door_span>" + firstFloor[y][x].doorN + "</span>" + "**</span>");
+          }else if(i === 3){
+            $("#main_con").append( "<span><span id=door_span>" + firstFloor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + firstFloor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + firstFloor[y][x].doorE + "</span></span>");
+          }else if (i === 5){
+            $("#main_con").append("<span>**" +  "<span id=door_span>" + firstFloor[y][x].doorS + "</span>" + "**</span>");
+          }else{
+            $("#main_con").append("<span>*&nbsp;&nbsp;&nbsp;*</span>");
+          }
+        }else{
+          $("#main_con").append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+        }
       }
+      $("#main_con").append("<br>");
     }
   }
+
 }
 
 function buildLevel() {
@@ -121,6 +147,22 @@ function buildLevel() {
       firstFloor[y][x] = new Room;
     }
   }
+
+  //Builds map
+
+  // roomMap += [];
+  //
+  // for(var y = 0; y < yAxisLength; ++y){
+  //   for(var i = 0; i < 5 ; ++i){
+  //     for(var x = 0; x < xAxisLength; ++x){
+  //       if(i === 0){
+  //         roomMap.lastIndexOf
+  //       }
+  //     }
+  //     $("#main_con").append("<br>");
+  //   }
+  // }
+
 
 //Populates doors. Currently split into separate loops to maintain flexibility. Will eventually be compressed.
   for(var y = 0; y < yAxisLength; ++y){
@@ -216,34 +258,34 @@ function findLightLevel() {
 
 }
 
-function drawHUD(expoOutput) {
-  $("#HUD_expo_output").text(expoOutput);
-  $("#HUD_light_output").text("The light here is " + firstFloor[playerY][playerX].lightLevel);
-  $("#HUD_keys_output").text("Keys: " + keys);
-  $("#HUD_batteries_output").text("Batteries: " + batteries);
-
-  flashlightMeter = "";
-  for(var i = 1; i <= flashlightPower/5; ++i){
-    flashlightMeter += "/";
-  }
-  if(flashlightPower/5 <=4){
-    $("#HUD_flashlight_output").css("color", "red");
-  }else{
-    $("#HUD_flashlight_output").css("color", "#00e600");
-  }
-  $("#HUD_flashlight_output").text("Flashlight: " + flashlightMeter);
-
-  sanityMeter = "";
-  for(var i = 1; i <= sanity/5; ++i){
-    sanityMeter += "/";
-  }
-  if(sanity/5 <=4){
-    $("#HUD_sanity_output").css("color", "red");
-  }else{
-    $("#HUD_sanity_output").css("color", "#00e600");
-  }
-  $("#HUD_sanity_output").text("Sanity: " + sanityMeter);
-}
+// function drawHUD(expoOutput) {
+//   $("#HUD_expo_output").text(expoOutput);
+//   $("#HUD_light_output").text("The light here is " + firstFloor[playerY][playerX].lightLevel);
+//   $("#HUD_keys_output").text("Keys: " + keys);
+//   $("#HUD_batteries_output").text("Batteries: " + batteries);
+//
+//   flashlightMeter = "";
+//   for(var i = 1; i <= flashlightPower/5; ++i){
+//     flashlightMeter += "/";
+//   }
+//   if(flashlightPower/5 <=4){
+//     $("#HUD_flashlight_output").css("color", "red");
+//   }else{
+//     $("#HUD_flashlight_output").css("color", "#00e600");
+//   }
+//   $("#HUD_flashlight_output").text("Flashlight: " + flashlightMeter);
+//
+//   sanityMeter = "";
+//   for(var i = 1; i <= sanity/5; ++i){
+//     sanityMeter += "/";
+//   }
+//   if(sanity/5 <=4){
+//     $("#HUD_sanity_output").css("color", "red");
+//   }else{
+//     $("#HUD_sanity_output").css("color", "#00e600");
+//   }
+//   $("#HUD_sanity_output").text("Sanity: " + sanityMeter);
+// }
 
 $(document).ready(function() {
 
@@ -255,7 +297,7 @@ $(document).ready(function() {
       buildLevel();
       drawLevel(false);
       findLightLevel();
-      drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
+      // drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
     }
 
     playerConsole(userInput);
