@@ -75,8 +75,130 @@ Vault.prototype.checkIfPassable = function(checkY, checkX) {
       return true;
     }
   }
+}
+
+Vault.prototype.buildVault = function() {
+  for(var y = 0; y < yAxisLength; ++y){
+    this.floor[y] = [];
+    for(var x = 0; x < xAxisLength; ++x){
+      this.floor[y][x] = new Room;
+    }
+  }
+
+//Populates doors. Currently split into separate loops to maintain flexibility. Will eventually be compressed.
+  for(var y = 0; y < yAxisLength; ++y){
+    for(var x = 0; x < xAxisLength; ++x){
+      var doorChance = (Math.floor(Math.random() * (13 - 1)) + 1);
+      var oneDoor = ["n","s","e","w"];
+      var twoDoors = ["ns","ne","nw","se","sw","ew"];
+      var threeDoors = ["nse","nsw","nwe","swe"]
+
+      if(doorChance >= 1 && doorChance <= 4){
+        this.floor[y][x].doorResult = oneDoor[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
+      }else if(doorChance >= 5 && doorChance <= 8){
+        this.floor[y][x].doorResult = twoDoors[(Math.floor(Math.random() * (6 - 0)) + 0)].split("");
+      }else if(doorChance >=9 && doorChance <= 11){
+        this.floor[y][x].doorResult = threeDoors[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
+      }else{
+        this.floor[y][x].doorResult = ["n","s","e","w"];
+      }
+    }
+  }
+
+  //Takes doorResult and uses it to add the data to the room objects, including locked doors.
+  for(var y = 0; y < yAxisLength; ++y){
+    for(var x = 0; x < xAxisLength; ++x){
+      for(var i = 0; i < this.floor[y][x].doorResult.length; ++i){
+        if(this.floor[y][x].doorResult[i] === "n"){
+          this.floor[y][x].doorN = "|";
+          if(y !== 0){
+            if(this.floor[y-1][x].doorS === "*"){
+              this.floor[y-1][x].doorS = "-";
+            }
+          }
+        }else if(this.floor[y][x].doorResult[i] === "s"){
+          this.floor[y][x].doorS = "|";
+          if(y !== 8){
+            if(this.floor[y+1][x].doorN === "*"){
+              this.floor[y+1][x].doorN = "-";
+            }
+          }
+        }else if(this.floor[y][x].doorResult[i] === "e"){
+          this.floor[y][x].doorE = "-";
+          if(x !== 8){
+            if(this.floor[y][x+1].doorW === "*"){
+              this.floor[y][x+1].doorW = "|";
+            }
+          }
+        }else{
+          // debugger;
+          this.floor[y][x].doorW = "-"
+          if(x !== 0){
+            if(this.floor[y][x-1].doorE === "*"){
+              this.floor[y][x-1].doorE = "|";
+            }
+          }
+        }
+      }
+
+      // Clears doors from edges of map
+      if(y === 0){
+        this.floor[y][x].doorN = "*";
+      }
+      if(x === 0){
+        this.floor[y][x].doorW = "*";
+      }
+      if(y === 8){
+        this.floor[y][x].doorS = "*";
+      }
+      if(x === 8){
+        this.floor[y][x].doorE = "*";
+      }
+    }
+  }
+
+  $("#console_input").attr("placeholder", "> (type 'help' for instructions)")
+
+  //Sets player origin. Currently static.
+  this.floor[4][4].playerLocation = "@";
+  this.floor[4][4].seenRoom = true;
+  this.floor[playerY][playerX].findLightLevel();
+  this.drawVault();
+}
+
+Vault.prototype.drawVault = function() {
+  $("span").remove();
+  $("br").remove();
+
+  for(var y = 0; y < yAxisLength; ++y){
+    for(var i = 1; i < 6 ; ++i){
+      for(var x = 0; x < xAxisLength; ++x){
+        if(this.floor[y][x].seenRoom){
+          if(i === 1){
+            $("#main_con").append("<span>**" + "<span id=door_span>" + this.floor[y][x].doorN + "</span>" + "**</span>");
+          }else if(i === 3){
+            $("#main_con").append( "<span><span id=door_span>" + this.floor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + this.floor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + this.floor[y][x].doorE + "</span></span>");
+          }else if (i === 5){
+            $("#main_con").append("<span>**" +  "<span id=door_span>" + this.floor[y][x].doorS + "</span>" + "**</span>");
+          }else{
+            $("#main_con").append("<span>*&nbsp;&nbsp;&nbsp;*</span>");
+          }
+        }else{
+          $("#main_con").append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
+        }
+      }
+      $("#main_con").append("<br>");
+    }
+  }
 
   return false;
+}
+
+function initializeVault() {
+  currentVault += 1;
+  vaultArray[currentVault] = new Vault;
+  vaultArray[currentVault].vaultNumber = currentVault;
+  vaultArray[currentVault].buildVault();
 }
 
 function movePlayer(direction) {
@@ -110,7 +232,7 @@ function movePlayer(direction) {
   vaultArray[currentVault].floor[playerY][playerX].seenRoom = true;
   $("span").remove();
 
-  drawVault();
+  vaultArray[currentVault].drawVault();
   drawHUD("");
 }
 
@@ -120,128 +242,6 @@ function playerConsole(userInput) {
   }
 }
 
-//Draws the level, the doors and the player. Will eventually only draw seen rooms.
-function drawVault() {
-  $("span").remove();
-  $("br").remove();
-
-  for(var y = 0; y < yAxisLength; ++y){
-    for(var i = 1; i < 6 ; ++i){
-      for(var x = 0; x < xAxisLength; ++x){
-        if(vaultArray[currentVault].floor[y][x].seenRoom){
-          if(i === 1){
-            $("#main_con").append("<span>**" + "<span id=door_span>" + vaultArray[currentVault].floor[y][x].doorN + "</span>" + "**</span>");
-          }else if(i === 3){
-            $("#main_con").append( "<span><span id=door_span>" + vaultArray[currentVault].floor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + vaultArray[currentVault].floor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + vaultArray[currentVault].floor[y][x].doorE + "</span></span>");
-          }else if (i === 5){
-            $("#main_con").append("<span>**" +  "<span id=door_span>" + vaultArray[currentVault].floor[y][x].doorS + "</span>" + "**</span>");
-          }else{
-            $("#main_con").append("<span>*&nbsp;&nbsp;&nbsp;*</span>");
-          }
-        }else{
-          $("#main_con").append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
-        }
-      }
-      $("#main_con").append("<br>");
-    }
-  }
-
-}
-
-function buildVault() {
-  //Builds empty floor
-
-  currentVault += 1;
-  vaultArray[currentVault] = new Vault;
-  vaultArray[currentVault].vaultNumber = currentVault;
-
-  for(var y = 0; y < yAxisLength; ++y){
-    vaultArray[currentVault].floor[y] = [];
-    for(var x = 0; x < xAxisLength; ++x){
-      vaultArray[currentVault].floor[y][x] = new Room;
-    }
-  }
-
-//Populates doors. Currently split into separate loops to maintain flexibility. Will eventually be compressed.
-  for(var y = 0; y < yAxisLength; ++y){
-    for(var x = 0; x < xAxisLength; ++x){
-      var doorChance = (Math.floor(Math.random() * (13 - 1)) + 1);
-      var oneDoor = ["n","s","e","w"];
-      var twoDoors = ["ns","ne","nw","se","sw","ew"];
-      var threeDoors = ["nse","nsw","nwe","swe"]
-
-      if(doorChance >= 1 && doorChance <= 4){
-        vaultArray[currentVault].floor[y][x].doorResult = oneDoor[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
-      }else if(doorChance >= 5 && doorChance <= 8){
-        vaultArray[currentVault].floor[y][x].doorResult = twoDoors[(Math.floor(Math.random() * (6 - 0)) + 0)].split("");
-      }else if(doorChance >=9 && doorChance <= 11){
-        vaultArray[currentVault].floor[y][x].doorResult = threeDoors[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
-      }else{
-        vaultArray[currentVault].floor[y][x].doorResult = ["n","s","e","w"];
-      }
-    }
-  }
-
-
-  //Takes doorResult and uses it to add the data to the room objects, including locked doors.
-  for(var y = 0; y < yAxisLength; ++y){
-    for(var x = 0; x < xAxisLength; ++x){
-
-      vaultArray[currentVault].floor[y][x].doorResult.forEach(function(currentDoor) {
-        if(currentDoor === "n"){
-          vaultArray[currentVault].floor[y][x].doorN = "|";
-          if(y !== 0){
-            if(vaultArray[currentVault].floor[y-1][x].doorS === "*"){
-              vaultArray[currentVault].floor[y-1][x].doorS = "-";
-            }
-          }
-        }else if(currentDoor === "s"){
-          vaultArray[currentVault].floor[y][x].doorS = "|";
-          if(y !== 8){
-            if(vaultArray[currentVault].floor[y+1][x].doorN === "*"){
-              vaultArray[currentVault].floor[y+1][x].doorN = "-";
-            }
-          }
-        }else if(currentDoor === "e"){
-          vaultArray[currentVault].floor[y][x].doorE = "-";
-          if(x !== 8){
-            if(vaultArray[currentVault].floor[y][x+1].doorW === "*"){
-              vaultArray[currentVault].floor[y][x+1].doorW = "|";
-            }
-          }
-        }else{
-          vaultArray[currentVault].floor[y][x].doorW = "-"
-          if(x !== 0){
-            if(vaultArray[currentVault].floor[y][x-1].doorE === "*"){
-              vaultArray[currentVault].floor[y][x-1].doorE = "|";
-            }
-          }
-        }
-      })
-
-      // // Clears doors from edges of map
-      if(y === 0){
-        vaultArray[currentVault].floor[y][x].doorN = "*";
-      }
-      if(x === 0){
-        vaultArray[currentVault].floor[y][x].doorW = "*";
-      }
-      if(y === 8){
-        vaultArray[currentVault].floor[y][x].doorS = "*";
-      }
-      if(x === 8){
-        vaultArray[currentVault].floor[y][x].doorE = "*";
-      }
-    }
-  }
-
-  $("#console_input").attr("placeholder", "> (type 'help' for instructions)")
-
-  //Sets player origin. Currently static.
-  vaultArray[currentVault].floor[4][4].playerLocation = "@";
-  vaultArray[currentVault].floor[4][4].seenRoom = true;
-  vaultArray[currentVault].floor[playerY][playerX].findLightLevel();
-}
 
 function drawHUD(expoOutput) {
   $("#HUD_con").append("<span>" + expoOutput + "</span>");
@@ -278,18 +278,14 @@ function drawHUD(expoOutput) {
 }
 
 $(document).ready(function() {
+  initializeVault();
 
-  buildVault();
-  drawVault();
   drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
 
   //Submit behavior for user input form
   $("#console_form").submit(function(event) {
     event.preventDefault();
     var userInput = $("#console_input").val().toLowerCase();
-    // if(userInput === "wake up"){
-
-    // }
 
     playerConsole(userInput);
 
