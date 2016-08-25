@@ -1,8 +1,5 @@
-// <span>*****<br>*&nbsp;&nbsp;&nbsp;*<br>*&nbsp;&nbsp;&nbsp;*<br>*&nbsp;&nbsp;&nbsp;*<br>*****</span>
-
 var xAxisLength = 9;
 var yAxisLength = 9;
-// var firstFloor = [];
 var keys = 99;
 var batteries = 0;
 var flashlightPower = 20  ;
@@ -12,11 +9,11 @@ var sanityMeter="";
 var playerY = 4;
 var playerX = 4;
 var vaultArray = [];
-
-// vaultArray[0].floor[y][x]
+var currentVault = -1;
 
 var Vault = function() {
   this.floor = [];
+  this.vaultNumber = 0;
 }
 
 var Room = function() {
@@ -30,37 +27,51 @@ var Room = function() {
   this.lightLevel = "";
 }
 
+Room.prototype.findLightLevel = function() {
+  var lightChance = (Math.floor(Math.random() * (100 - 1)) + 1);
+
+  if(lightChance >= 1 && lightChance <= 20){
+    this.lightLevel = "dark";
+  }else if(lightChance >= 21 && lightChance <= 40){
+    this.lightLevel = "flickering";
+  }else if(lightChance >= 41 && lightChance <= 80){
+    this.lightLevel = "dim";
+  }else{
+    this.lightLevel = "bright";
+  }
+}
+
 // Returns true if there is a door and it is either unlocked, or locked and the player has a key
 function checkIfPassable(checkY, checkX) {
-  if(checkY === -1 && vaultArray[0].floor[playerY][playerX].doorN === "|"){
-    if(vaultArray[0].floor[playerY + checkY][playerX].doorS === "|"){
+  if(checkY === -1 && vaultArray[currentVault].floor[playerY][playerX].doorN === "|"){
+    if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorS === "|"){
       return true;
-    }else if(vaultArray[0].floor[playerY + checkY][playerX].doorS === "-" && keys>0){
-      vaultArray[0].floor[playerY + checkY][playerX].doorS = "|";
+    }else if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorS === "-" && keys>0){
+      vaultArray[currentVault].floor[playerY + checkY][playerX].doorS = "|";
       keys -=1;
       return true;
     }
-  }else if(checkY === +1 && vaultArray[0].floor[playerY][playerX].doorS === "|"){
-    if(vaultArray[0].floor[playerY + checkY][playerX].doorN === "|"){
+  }else if(checkY === +1 && vaultArray[currentVault].floor[playerY][playerX].doorS === "|"){
+    if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorN === "|"){
       return true;
-    }else if(vaultArray[0].floor[playerY + checkY][playerX].doorN === "-" && keys>0){
-      vaultArray[0].floor[playerY + checkY][playerX].doorN = "|";
+    }else if(vaultArray[currentVault].floor[playerY + checkY][playerX].doorN === "-" && keys>0){
+      vaultArray[currentVault].floor[playerY + checkY][playerX].doorN = "|";
       keys -=1;
       return true;
     }
-  }else if(checkX === +1 && vaultArray[0].floor[playerY][playerX].doorE === "-"){
-    if(vaultArray[0].floor[playerY][playerX + checkX].doorW === "-"){
+  }else if(checkX === +1 && vaultArray[currentVault].floor[playerY][playerX].doorE === "-"){
+    if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorW === "-"){
       return true;
-    }else if(vaultArray[0].floor[playerY][playerX + checkX].doorW === "|" && keys>0){
-      vaultArray[0].floor[playerY][playerX + checkX].doorW = "-";
+    }else if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorW === "|" && keys>0){
+      vaultArray[currentVault].floor[playerY][playerX + checkX].doorW = "-";
       keys -=1;
       return true;
     }
-  }else if(checkX === -1 && vaultArray[0].floor[playerY][playerX].doorW === "-"){
-    if(vaultArray[0].floor[playerY][playerX + checkX].doorE === "-"){
+  }else if(checkX === -1 && vaultArray[currentVault].floor[playerY][playerX].doorW === "-"){
+    if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorE === "-"){
       return true;
-    }else if(vaultArray[0].floor[playerY][playerX + checkX].doorE === "|" && keys>0){
-      vaultArray[0].floor[playerY][playerX + checkX].doorE = "-";
+    }else if(vaultArray[currentVault].floor[playerY][playerX + checkX].doorE === "|" && keys>0){
+      vaultArray[currentVault].floor[playerY][playerX + checkX].doorE = "-";
       keys -=1;
       return true;
     }
@@ -73,31 +84,31 @@ function movePlayer(direction) {
 
   if(direction === "n"){
     if(checkIfPassable(-1,0)){
-      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
+      vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerY -= 1;
     }
   }else if(direction === "s"){
     if(checkIfPassable(+1,0)){
-      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
+      vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerY += 1;
     }
   }else if(direction === "e"){
     if(checkIfPassable(0,+1)){
-      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
+      vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerX += 1;
     }
   }else if(direction === "w"){
     if(checkIfPassable(0,-1)){
-      vaultArray[0].floor[playerY][playerX].playerLocation = " ";
+      vaultArray[currentVault].floor[playerY][playerX].playerLocation = " ";
       playerX -= 1;
     }
   }
 
-  vaultArray[0].floor[playerY][playerX].playerLocation = "@";
-  if(vaultArray[0].floor[playerY][playerX].seenRoom === false){
-    findLightLevel();
+  vaultArray[currentVault].floor[playerY][playerX].playerLocation = "@";
+  if(vaultArray[currentVault].floor[playerY][playerX].seenRoom === false){
+    vaultArray[currentVault].floor[playerY][playerX].findLightLevel();
   }
-  vaultArray[0].floor[playerY][playerX].seenRoom = true;
+  vaultArray[currentVault].floor[playerY][playerX].seenRoom = true;
   $("span").remove();
 
   drawVault();
@@ -118,13 +129,13 @@ function drawVault() {
   for(var y = 0; y < yAxisLength; ++y){
     for(var i = 1; i < 6 ; ++i){
       for(var x = 0; x < xAxisLength; ++x){
-        if(vaultArray[0].floor[y][x].seenRoom){
+        if(vaultArray[currentVault].floor[y][x].seenRoom){
           if(i === 1){
-            $("#main_con").append("<span>**" + "<span id=door_span>" + vaultArray[0].floor[y][x].doorN + "</span>" + "**</span>");
+            $("#main_con").append("<span>**" + "<span id=door_span>" + vaultArray[currentVault].floor[y][x].doorN + "</span>" + "**</span>");
           }else if(i === 3){
-            $("#main_con").append( "<span><span id=door_span>" + vaultArray[0].floor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + vaultArray[0].floor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + vaultArray[0].floor[y][x].doorE + "</span></span>");
+            $("#main_con").append( "<span><span id=door_span>" + vaultArray[currentVault].floor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + vaultArray[currentVault].floor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + vaultArray[currentVault].floor[y][x].doorE + "</span></span>");
           }else if (i === 5){
-            $("#main_con").append("<span>**" +  "<span id=door_span>" + vaultArray[0].floor[y][x].doorS + "</span>" + "**</span>");
+            $("#main_con").append("<span>**" +  "<span id=door_span>" + vaultArray[currentVault].floor[y][x].doorS + "</span>" + "**</span>");
           }else{
             $("#main_con").append("<span>*&nbsp;&nbsp;&nbsp;*</span>");
           }
@@ -141,12 +152,14 @@ function drawVault() {
 function buildVault() {
   //Builds empty floor
 
-  vaultArray[0] = new Vault;
+  currentVault += 1;
+  vaultArray[currentVault] = new Vault;
+  vaultArray[currentVault].vaultNumber = currentVault;
 
   for(var y = 0; y < yAxisLength; ++y){
-    vaultArray[0].floor[y] = [];
+    vaultArray[currentVault].floor[y] = [];
     for(var x = 0; x < xAxisLength; ++x){
-      vaultArray[0].floor[y][x] = new Room;
+      vaultArray[currentVault].floor[y][x] = new Room;
     }
   }
 
@@ -159,13 +172,13 @@ function buildVault() {
       var threeDoors = ["nse","nsw","nwe","swe"]
 
       if(doorChance >= 1 && doorChance <= 4){
-        vaultArray[0].floor[y][x].doorResult = oneDoor[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
+        vaultArray[currentVault].floor[y][x].doorResult = oneDoor[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
       }else if(doorChance >= 5 && doorChance <= 8){
-        vaultArray[0].floor[y][x].doorResult = twoDoors[(Math.floor(Math.random() * (6 - 0)) + 0)].split("");
+        vaultArray[currentVault].floor[y][x].doorResult = twoDoors[(Math.floor(Math.random() * (6 - 0)) + 0)].split("");
       }else if(doorChance >=9 && doorChance <= 11){
-        vaultArray[0].floor[y][x].doorResult = threeDoors[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
+        vaultArray[currentVault].floor[y][x].doorResult = threeDoors[(Math.floor(Math.random() * (4 - 0)) + 0)].split("");
       }else{
-        vaultArray[0].floor[y][x].doorResult = ["n","s","e","w"];
+        vaultArray[currentVault].floor[y][x].doorResult = ["n","s","e","w"];
       }
     }
   }
@@ -175,33 +188,33 @@ function buildVault() {
   for(var y = 0; y < yAxisLength; ++y){
     for(var x = 0; x < xAxisLength; ++x){
 
-      vaultArray[0].floor[y][x].doorResult.forEach(function(currentDoor) {
+      vaultArray[currentVault].floor[y][x].doorResult.forEach(function(currentDoor) {
         if(currentDoor === "n"){
-          vaultArray[0].floor[y][x].doorN = "|";
+          vaultArray[currentVault].floor[y][x].doorN = "|";
           if(y !== 0){
-            if(vaultArray[0].floor[y-1][x].doorS === "*"){
-              vaultArray[0].floor[y-1][x].doorS = "-";
+            if(vaultArray[currentVault].floor[y-1][x].doorS === "*"){
+              vaultArray[currentVault].floor[y-1][x].doorS = "-";
             }
           }
         }else if(currentDoor === "s"){
-          vaultArray[0].floor[y][x].doorS = "|";
+          vaultArray[currentVault].floor[y][x].doorS = "|";
           if(y !== 8){
-            if(vaultArray[0].floor[y+1][x].doorN === "*"){
-              vaultArray[0].floor[y+1][x].doorN = "-";
+            if(vaultArray[currentVault].floor[y+1][x].doorN === "*"){
+              vaultArray[currentVault].floor[y+1][x].doorN = "-";
             }
           }
         }else if(currentDoor === "e"){
-          vaultArray[0].floor[y][x].doorE = "-";
+          vaultArray[currentVault].floor[y][x].doorE = "-";
           if(x !== 8){
-            if(vaultArray[0].floor[y][x+1].doorW === "*"){
-              vaultArray[0].floor[y][x+1].doorW = "|";
+            if(vaultArray[currentVault].floor[y][x+1].doorW === "*"){
+              vaultArray[currentVault].floor[y][x+1].doorW = "|";
             }
           }
         }else{
-          vaultArray[0].floor[y][x].doorW = "-"
+          vaultArray[currentVault].floor[y][x].doorW = "-"
           if(x !== 0){
-            if(vaultArray[0].floor[y][x-1].doorE === "*"){
-              vaultArray[0].floor[y][x-1].doorE = "|";
+            if(vaultArray[currentVault].floor[y][x-1].doorE === "*"){
+              vaultArray[currentVault].floor[y][x-1].doorE = "|";
             }
           }
         }
@@ -209,16 +222,16 @@ function buildVault() {
 
       // // Clears doors from edges of map
       if(y === 0){
-        vaultArray[0].floor[y][x].doorN = "*";
+        vaultArray[currentVault].floor[y][x].doorN = "*";
       }
       if(x === 0){
-        vaultArray[0].floor[y][x].doorW = "*";
+        vaultArray[currentVault].floor[y][x].doorW = "*";
       }
       if(y === 8){
-        vaultArray[0].floor[y][x].doorS = "*";
+        vaultArray[currentVault].floor[y][x].doorS = "*";
       }
       if(x === 8){
-        vaultArray[0].floor[y][x].doorE = "*";
+        vaultArray[currentVault].floor[y][x].doorE = "*";
       }
     }
   }
@@ -226,28 +239,14 @@ function buildVault() {
   $("#console_input").attr("placeholder", "> (type 'help' for instructions)")
 
   //Sets player origin. Currently static.
-  vaultArray[0].floor[4][4].playerLocation = "@";
-  vaultArray[0].floor[4][4].seenRoom = true;
-}
-
-function findLightLevel() {
-  var lightChance = (Math.floor(Math.random() * (100 - 1)) + 1);
-
-  if(lightChance >= 1 && lightChance <= 20){
-    vaultArray[0].floor[playerY][playerX].lightLevel = "dark";
-  }else if(lightChance >= 21 && lightChance <= 40){
-    vaultArray[0].floor[playerY][playerX].lightLevel = "flickering";
-  }else if(lightChance >= 41 && lightChance <= 80){
-    vaultArray[0].floor[playerY][playerX].lightLevel = "dim";
-  }else{
-    vaultArray[0].floor[playerY][playerX].lightLevel = "bright";
-  }
-
+  vaultArray[currentVault].floor[4][4].playerLocation = "@";
+  vaultArray[currentVault].floor[4][4].seenRoom = true;
+  vaultArray[currentVault].floor[playerY][playerX].findLightLevel();
 }
 
 function drawHUD(expoOutput) {
   $("#HUD_con").append("<span>" + expoOutput + "</span>");
-  $("#HUD_con").append("<span> The light here is " + vaultArray[0].floor[playerY][playerX].lightLevel + ".</span><br><br>");
+  $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[playerY][playerX].lightLevel + ".</span><br><br>");
   $("#HUD_con").append("<span>Keys: " + keys + "</span><br>");
   $("#HUD_con").append("<span>Batteries: " + batteries + "</span><br><br>");
 
@@ -281,16 +280,17 @@ function drawHUD(expoOutput) {
 
 $(document).ready(function() {
 
+  buildVault();
+  drawVault();
+  drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
+
   //Submit behavior for user input form
   $("#console_form").submit(function(event) {
     event.preventDefault();
     var userInput = $("#console_input").val().toLowerCase();
-    if(userInput === "wake up"){
-      buildVault();
-      drawVault();
-      findLightLevel();
-      drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
-    }
+    // if(userInput === "wake up"){
+
+    // }
 
     playerConsole(userInput);
 
