@@ -38,11 +38,8 @@ var playery = 0;
   // Hallway Size
   var hallLengthMin = 10;
   var hallLengthMax = 21;
-  var hallWidthMin = 1;
-  var hallWidthMax = 3;
 
-
-// Creates a blank level of yAxis by xAxis.
+// Master floor creation function
 function createFloor(){
   for(var y = 0; y < yAxis; ++y){
     firstFloor[y] = [];
