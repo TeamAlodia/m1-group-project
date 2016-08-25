@@ -5,7 +5,7 @@ var yAxisLength = 9;
 // var firstFloor = [];
 var keys = 99;
 var batteries = 0;
-var flashlightPower = 100;
+var flashlightPower = 20  ;
 var flashlightMeter = "";
 var sanity = 100;
 var sanityMeter="";
@@ -94,10 +94,14 @@ function movePlayer(direction) {
   }
 
   vaultArray[0].floor[playerY][playerX].playerLocation = "@";
+  if(vaultArray[0].floor[playerY][playerX].seenRoom === false){
+    findLightLevel();
+  }
   vaultArray[0].floor[playerY][playerX].seenRoom = true;
   $("span").remove();
 
   drawVault();
+  drawHUD("");
 }
 
 function playerConsole(userInput) {
@@ -241,34 +245,39 @@ function findLightLevel() {
 
 }
 
-// function drawHUD(expoOutput) {
-//   $("#HUD_expo_output").text(expoOutput);
-//   $("#HUD_light_output").text("The light here is " + firstFloor[playerY][playerX].lightLevel);
-//   $("#HUD_keys_output").text("Keys: " + keys);
-//   $("#HUD_batteries_output").text("Batteries: " + batteries);
-//
-//   flashlightMeter = "";
-//   for(var i = 1; i <= flashlightPower/5; ++i){
-//     flashlightMeter += "/";
-//   }
-//   if(flashlightPower/5 <=4){
-//     $("#HUD_flashlight_output").css("color", "red");
-//   }else{
-//     $("#HUD_flashlight_output").css("color", "#00e600");
-//   }
-//   $("#HUD_flashlight_output").text("Flashlight: " + flashlightMeter);
-//
-//   sanityMeter = "";
-//   for(var i = 1; i <= sanity/5; ++i){
-//     sanityMeter += "/";
-//   }
-//   if(sanity/5 <=4){
-//     $("#HUD_sanity_output").css("color", "red");
-//   }else{
-//     $("#HUD_sanity_output").css("color", "#00e600");
-//   }
-//   $("#HUD_sanity_output").text("Sanity: " + sanityMeter);
-// }
+function drawHUD(expoOutput) {
+  $("#HUD_con").append("<span>" + expoOutput + "</span>");
+  $("#HUD_con").append("<span> The light here is " + vaultArray[0].floor[playerY][playerX].lightLevel + ".</span><br><br>");
+  $("#HUD_con").append("<span>Keys: " + keys + "</span><br>");
+  $("#HUD_con").append("<span>Batteries: " + batteries + "</span><br><br>");
+
+  flashlightMeter = "";
+  for(var i = 1; i <= flashlightPower/5; ++i){
+    flashlightMeter += "/";
+  }
+
+  $("#HUD_con").append("<span id='HUD_flashlight_output'>Flashlight: " + flashlightMeter + "</span><br><br>");
+
+  if(flashlightPower/5 <=4){
+    $("#HUD_flashlight_output").css("color", "red");
+  }else{
+    $("#HUD_flashlight_output").css("color", "#00e600");
+  }
+
+
+  sanityMeter = "";
+  for(var i = 1; i <= sanity/5; ++i){
+    sanityMeter += "/";
+  }
+
+  $("#HUD_con").append("<span id='HUD_sanity_output'>Sanity: " + sanityMeter + "</span><br>");
+
+  if(sanity/5 <=4){
+    $("#HUD_sanity_output").css("color", "red");
+  }else{
+    $("#HUD_sanity_output").css("color", "#00e600");
+  }
+}
 
 $(document).ready(function() {
 
@@ -280,7 +289,7 @@ $(document).ready(function() {
       buildVault();
       drawVault();
       findLightLevel();
-      // drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
+      drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
     }
 
     playerConsole(userInput);

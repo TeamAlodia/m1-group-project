@@ -13,6 +13,10 @@ body{
   color: green;
 }
 
+#main_con{
+  float: left;
+}
+
 .form-control{
 
 }
