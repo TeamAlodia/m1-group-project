@@ -84,6 +84,9 @@ function createFloor(){
   // Inserts player icon.
   firstFloor[playery][playerx] = "@";
 
+  // Removes all Xs from the map array and replaces them with "&nbsp;"
+  removeDirt();
+
   // Draws map
   drawFloor();
 };
@@ -183,6 +186,17 @@ function insertTunnel(origin) {
     firstFloor[yOrigin][xOrigin] = ".";
 };
 
+// Removes dirt and replaces it with nbsp
+function removeDirt(){
+  for(var y = 0; y < yAxis; ++y){
+    for(var x = 0; x < xAxis; ++x) {
+      if(firstFloor[y][x] === "X"){
+        firstFloor[y][x] = "&nbsp;";
+      }
+    }
+  }
+};
+
 // Clears map and recreates it based on the array
 function drawFloor(){
   // Clears map
@@ -194,9 +208,7 @@ function drawFloor(){
     var lineContent = "";
 
     for(var x = 0; x < xAxis; ++x) {
-      if(firstFloor[y][x] === "X"){
-        lineContent += "&nbsp;";
-      } else if(firstFloor[y][x] === "@"){
+      if(firstFloor[y][x] === "@"){
         lineContent += '<span id="player_span">@</span>';
       }else {
       lineContent += firstFloor[y][x];

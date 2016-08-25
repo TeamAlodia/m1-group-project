@@ -25,6 +25,7 @@
   * createIndex - takes in a character and returns an array detailing all locations in the floor array containing that character.
   * insertWalls - replaces dirt(X) surrounding floors(.) with walls (#) in the floor array
   * insertTunnel - takes in a coordinate of a random wall and digs a hall of variable length related to hallLengthMin and hallLengthMax
+  * removeDirt - replaces all dirt(X) in floor array with blanks
   * drawFloor - takes the floor array and draws it for player. Uses appended spans for each horizontal line.
 * doKeyDown - interprets keypresses (currently qweadzxc as direction keys)
   * playerMovement - takes in two integers related to desired movement and checks the map to see if movement is viable. Redraws the map if it is.
