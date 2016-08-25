@@ -32,12 +32,15 @@ var playery = 0;
 
 // Justin's Settings
   // Map Size
-  var xAxis = 200;
+  var xAxis = 100;
   var yAxis = 100;
   var complexity = 300;
   // Hallway Size
   var hallLengthMin = 10;
   var hallLengthMax = 21;
+  // Line of Sight
+  var baseSightLength = 10;
+  var sightLength = baseSightLength;
 
 // Master floor creation function
 function createFloor(){
@@ -142,7 +145,7 @@ function drawPerimeter(){
   }
 };
 
-// Takes in a wall location(origin) and inserts a line of floor (.) of variable length in a variable direction
+// Takes in a wall location(origin) composed of an array [[y,x]] and inserts a line of floor (.) of variable length in a variable direction
 function insertTunnel(origin) {
 
   var yOrigin = origin[0];
@@ -203,18 +206,26 @@ function drawFloor(){
   $("span").remove();
   $("br").remove();
 
+  var y = playery - sightLength;
+  var x = playerx - sightLength;
+
   // Appends map array into HTML
-  for(var y = 0; y < yAxis; ++y){
+  for(y; y < playery + sightLength + 1; ++y){
     var lineContent = "";
 
-    for(var x = 0; x < xAxis; ++x) {
-      if(firstFloor[y][x] === "@"){
-        lineContent += '<span id="player_span">@</span>';
-      }else {
-      lineContent += firstFloor[y][x];
+    for(x; x < playerx + sightLength + 1; ++x) {
+      if(((x-playerx)*(x-playerx) + (y-playery)*(y-playery) <= (sightLength*sightLength))){
+        if(firstFloor[y][x] === "@"){
+          lineContent += '<span id="player_span">@</span>';
+        }else {
+        lineContent += firstFloor[y][x];
+        }
+      } else {
+        lineContent += "&nbsp;";
       }
     }
-    $("#map").append("<span id='line" + y +"'>" + lineContent + "</span><br>");
+    $("#map").append("<span>" + lineContent + "</span><br>");
+    x = playerx - sightLength;
   }
 };
 
