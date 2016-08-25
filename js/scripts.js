@@ -39,7 +39,7 @@ var playery = 0;
   var hallLengthMin = 10;
   var hallLengthMax = 21;
   // Line of Sight
-  var baseSightLength = 10;
+  var baseSightLength = 100;
   var sightLength = baseSightLength;
 
 // Master floor creation function
@@ -206,14 +206,22 @@ function drawFloor(){
   $("span").remove();
   $("br").remove();
 
-  var y = playery - sightLength;
-  var x = playerx - sightLength;
+  var y = 0;
+  var x = 0;
+
+  if(playery - sightLength > 0){
+    y = playery - sightLength;
+  }
+  if(playerx - sightLength > 0){
+    x = playerx - sightLength;
+  }
 
   // Appends map array into HTML
-  for(y; y < playery + sightLength + 1; ++y){
+  for(y; y < playery + sightLength + 1 && y < yAxis && y >= 0; ++y){
     var lineContent = "";
-
-    for(x; x < playerx + sightLength + 1; ++x) {
+    debugger
+    for(x; x < playerx + sightLength + 1 && x < xAxis && x >= 0; ++x) {
+      debugger
       if(((x-playerx)*(x-playerx) + (y-playery)*(y-playery) <= (sightLength*sightLength))){
         if(firstFloor[y][x] === "@"){
           lineContent += '<span id="player_span">@</span>';
@@ -226,6 +234,9 @@ function drawFloor(){
     }
     $("#map").append("<span>" + lineContent + "</span><br>");
     x = playerx - sightLength;
+    if(x < 0){
+      x = 0;
+    }
   }
 };
 
