@@ -247,10 +247,10 @@ function drawFloor(){
 function checkSight(offset) {
 
   var perimeterArray = [];
-  for(var x = 0; x <= 20; ++x){
-    perimeterArray.push([20,x]);
+  for(var x = 0; x < mapArray.length; ++x){
+    perimeterArray.push([mapArray.length - 1,x]);
     perimeterArray.push([0,x]);
-    perimeterArray.push([x,20]);
+    perimeterArray.push([x,mapArray.length - 1]);
     perimeterArray.push([x,0]);
   }
 
@@ -293,10 +293,14 @@ var drawline = function(x0,y0,x1,y1){
 }
 
 var plot = function(x,y){
-  if(playerx + x >= xMax || playery + y >= yMax || playerx + x < 0 || playery + y < 0 || sightLength + y < 0 || sightLength + x < 0){
+  if(playerx + x >= xMax || playery + y >= yMax || playerx + x < 0 || playery + y < 0 || sightLength + y <= 0 || sightLength + x < 0){
     return false;
   }
   // BORDER PROBLEM - when the mapArray doesn't have an index corresponding to sightLength+x or sightLength+y, it throws an error. Exiting the function if there isn't a corresponding index prevents the function from throwing an error, but the LOS is then screwed up. Solutions?
+  // else if(!mapArray[sightLength+x][sightLength+y]){
+  else if(sightLength + x > mapArray.length){
+    return false;
+  }
   else{
     if(mapArray[sightLength+x][sightLength+y].match(/@/g)){
       mapArray[sightLength+x][sightLength+y] = "<span id='player_span'>" + mapArray[sightLength+x][sightLength+y] + "</span>";
