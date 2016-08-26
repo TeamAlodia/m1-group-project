@@ -1,4 +1,4 @@
- // Alaina's Global Variables
+// Alaina's Global Variables
 // var xAxisLength = 9;
 // var yAxisLength = 9;
 // var firstLevel = [];
@@ -232,10 +232,10 @@ function drawFloor(){
     xMax = playerx+sightLength;
   }
 
-  for(y = 0; y < yMax - yMin; ++y){
-    mapArray[y]=[];
-    for(x = 0; x <  xMax - xMin; ++x){
-      mapArray[y][x]=firstFloor[playery - sightLength + y][playerx - sightLength + x];
+  for(var tempY = 0; tempY < yMax - yMin; ++tempY){
+    mapArray[tempY]=[];
+    for(tempX = 0; tempX <  xMax - xMin; ++tempX){
+      mapArray[tempY][tempX]=firstFloor[y + tempY][x + tempX];
     }
   }
 
@@ -293,18 +293,20 @@ var drawline = function(x0,y0,x1,y1){
 }
 
 var plot = function(x,y){
-  if(playerx + x >= xMax || playery + y >= yMax || playerx + x < 0 || playery + y < 0){
+  if(playerx + x >= xMax || playery + y >= yMax || playerx + x < 0 || playery + y < 0 || sightLength + y < 0 || sightLength + x < 0){
     return false;
-  }else{
-    if(mapArray[10+x][10+y].match(/@/g)){
-      mapArray[10+x][10+y] = "<span id='player_span'>" + mapArray[10+x][10+y] + "</span>";
+  }
+  // BORDER PROBLEM - when the mapArray doesn't have an index corresponding to sightLength+x or sightLength+y, it throws an error. Exiting the function if there isn't a corresponding index prevents the function from throwing an error, but the LOS is then screwed up. Solutions?
+  else{
+    if(mapArray[sightLength+x][sightLength+y].match(/@/g)){
+      mapArray[sightLength+x][sightLength+y] = "<span id='player_span'>" + mapArray[sightLength+x][sightLength+y] + "</span>";
       return true;
-    }else if(mapArray[10+x][10+y].match(/#/g) === null){
-      mapArray[10+x][10+y] = "<span id='visible'>" + mapArray[10+x][10+y] + "</span>";
+    }else if(mapArray[sightLength+x][sightLength+y].match(/#/g) === null){
+      mapArray[sightLength+x][sightLength+y] = "<span id='visible'>" + mapArray[sightLength+x][sightLength+y] + "</span>";
       return true;
     }
     else{
-      mapArray[10+x][10+y] = "<span id='visible'>" + mapArray[10+x][10+y] + "</span>";
+      mapArray[sightLength+x][sightLength+y] = "<span id='visible'>" + mapArray[sightLength+x][sightLength+y] + "</span>";
       return false;
     }
   }
