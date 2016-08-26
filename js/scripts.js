@@ -1,4 +1,4 @@
-// Alaina's Global Variables
+ // Alaina's Global Variables
 // var xAxisLength = 9;
 // var yAxisLength = 9;
 // var firstLevel = [];
@@ -29,17 +29,20 @@ var firstfirstFloorList = [];
 var firstWallList = [];
 var playerx = 0;
 var playery = 0;
+var mapArray = [];
+var yMax;
+var xMax;
 
 // Justin's Settings
   // Map Size
-  var xAxis = 100;
-  var yAxis = 100;
-  var complexity = 300;
+  var xAxis = 50;
+  var yAxis = 50;
+  var complexity = 30;
   // Hallway Size
   var hallLengthMin = 10;
   var hallLengthMax = 21;
   // Line of Sight
-  var baseSightLength = 100;
+  var baseSightLength = 10;
   var sightLength = baseSightLength;
 
 // Master floor creation function
@@ -200,7 +203,6 @@ function removeDirt(){
   }
 };
 
-// Clears map and recreates it based on the array
 function drawFloor(){
   // Clears map
   $("span").remove();
@@ -208,37 +210,121 @@ function drawFloor(){
 
   var y = 0;
   var x = 0;
+  yMax = yAxis;
+  var yMin = 0;
+  xMax = xAxis;
+  var xMin = 0;
+
+  mapArray = [];
 
   if(playery - sightLength > 0){
     y = playery - sightLength;
+    yMin = y;
   }
   if(playerx - sightLength > 0){
     x = playerx - sightLength;
+    xMin = x;
+  }
+  if(playery + sightLength < yAxis){
+    yMax = playery+sightLength;
+  }
+  if(playerx + sightLength < xAxis){
+    xMax = playerx+sightLength;
   }
 
-  // Appends map array into HTML
-  for(y; y < playery + sightLength + 1 && y < yAxis && y >= 0; ++y){
-    var lineContent = "";
-    debugger
-    for(x; x < playerx + sightLength + 1 && x < xAxis && x >= 0; ++x) {
-      debugger
-      if(((x-playerx)*(x-playerx) + (y-playery)*(y-playery) <= (sightLength*sightLength))){
-        if(firstFloor[y][x] === "@"){
-          lineContent += '<span id="player_span">@</span>';
-        }else {
-        lineContent += firstFloor[y][x];
-        }
-      } else {
-        lineContent += "&nbsp;";
-      }
-    }
-    $("#map").append("<span>" + lineContent + "</span><br>");
-    x = playerx - sightLength;
-    if(x < 0){
-      x = 0;
+  for(y = 0; y < yMax - yMin; ++y){
+    mapArray[y]=[];
+    for(x = 0; x <  xMax - xMin; ++x){
+      mapArray[y][x]=firstFloor[playery - sightLength + y][playerx - sightLength + x];
     }
   }
+
+  checkSight(sightLength);
+  drawMap();
 };
+
+//Begin LoS Functions
+function checkSight(offset) {
+
+  var perimeterArray = [];
+  for(var x = 0; x <= 20; ++x){
+    perimeterArray.push([20,x]);
+    perimeterArray.push([0,x]);
+    perimeterArray.push([x,20]);
+    perimeterArray.push([x,0]);
+  }
+
+  for(var i = 0; i < perimeterArray.length; ++i){
+      drawline(0,0,perimeterArray[i][1] - offset,perimeterArray[i][0] - offset);
+  }
+
+};
+
+var drawline = function(x0,y0,x1,y1){
+	var tmp;
+	var steep = Math.abs(y1-y0) > Math.abs(x1-x0);
+  if(steep){
+  	//swap x0,y0
+  	tmp=x0; x0=y0; y0=tmp;
+    //swap x1,y1
+    tmp=x1; x1=y1; y1=tmp;
+  }
+
+  var sign = 1;
+	if(x0>x1){
+    sign = -1;
+    x0 *= -1;
+    x1 *= -1;
+  }
+  var dx = x1-x0;
+  var dy = Math.abs(y1-y0);
+  var err = ((dx/2));
+  var ystep = y0 < y1 ? 1:-1;
+  var y = y0;
+
+  for(var x=x0;x<=x1;x++){
+  	if(!(steep ? plot(y,sign*x) : plot(sign*x,y))) return;
+    err = (err - dy);
+    if(err < 0){
+    	y+=ystep;
+      err+=dx;
+    }
+  }
+}
+
+var plot = function(x,y){
+  if(playerx + x >= xMax || playery + y >= yMax || playerx + x < 0 || playery + y < 0){
+    return false;
+  }else{
+    if(mapArray[10+x][10+y].match(/@/g)){
+      mapArray[10+x][10+y] = "<span id='player_span'>" + mapArray[10+x][10+y] + "</span>";
+      return true;
+    }else if(mapArray[10+x][10+y].match(/#/g) === null){
+      mapArray[10+x][10+y] = "<span id='visible'>" + mapArray[10+x][10+y] + "</span>";
+      return true;
+    }
+    else{
+      mapArray[10+x][10+y] = "<span id='visible'>" + mapArray[10+x][10+y] + "</span>";
+      return false;
+    }
+  }
+}
+
+function drawMap() {
+  $("#map").text("");
+  for(y = 0; y < mapArray.length; ++y){
+    for(x = 0; x < mapArray.length; ++x){
+      if(mapArray[y][x] === "#"){
+        $("#map").append("<span id='block'>" + mapArray[y][x] + "</span>");
+      }else if(mapArray[y][x] === "@"){
+        $("#map").append("<span id='player_span'>" + mapArray[y][x] + "</span>");
+      }else{
+        $("#map").append(mapArray[y][x]);
+      }
+    }
+  $("#map").append("<br>");
+  }
+}
 
 // Always active keyboard input
 window.addEventListener("keypress", doKeyDown, false);

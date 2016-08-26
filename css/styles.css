@@ -1,9 +1,13 @@
 body{
   font-family: VT323;
   background-color: black;
-  color: #00e600;
-  /*Justin's Styling*/
+  color: black;
   line-height: 10px;
+}
+
+
+#visible{
+  color: #00e600;
 }
 
 #player_span {
