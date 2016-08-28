@@ -5,21 +5,33 @@ body{
   line-height: 10px;
 }
 
+
 .visible{
   color: #00e600;
   line-height: 10px;
 }
 
+<<<<<<< HEAD
 #player_span{
   color: white;
-}
-
+=======
 #player {
   color: white;
 }
 
 .block{
   color: #ccffcc;
+}
+
+.form-control{
+
+}
+
+.col-xs-1{
+  width: auto;
+  line-height: 10px;
+  padding: 0;
+>>>>>>> 1d906b4393ff5abbc0369df8e2760135b2af29f2
 }
 
 #door_span{
