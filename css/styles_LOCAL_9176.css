@@ -1,25 +1,12 @@
 body{
   font-family: VT323;
   background-color: black;
-  color: black;
-  line-height: 10px;
-}
-
-.visible{
   color: #00e600;
   line-height: 10px;
 }
 
 #player_span{
   color: white;
-}
-
-#player {
-  color: white;
-}
-
-.block{
-  color: #ccffcc;
 }
 
 #door_span{
