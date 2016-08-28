@@ -5,13 +5,13 @@ var flashlightMeter = "";
 var flashlightState = "on";
 var sanity = 100;
 var sanityMeter="";
-var playerY = 4;
-var playerX = 4;
 var vaultArray = [];
 var currentVault = -1;
 var inVault = true;
 
 var Vault = function(yAxisLength, xAxisLength) {
+  this.playerX = 4;
+  this.playerY = 4;
   this.floor = [];
   this.vaultNumber = 0;
   this.yAxisLength = yAxisLength;
@@ -103,7 +103,7 @@ Vault.prototype.buildVault = function() {
   //Sets player origin. Currently static.
   this.floor[4][4].playerLocation = "@";
   this.floor[4][4].seenRoom = true;
-  this.floor[playerY][playerX].findLightLevel();
+  this.floor[this.playerY][this.playerX].findLightLevel();
   this.drawVault();
 }
 
@@ -135,64 +135,64 @@ Vault.prototype.drawVault = function() {
 Vault.prototype.movePlayer = function(direction) {
   if(direction === "n"){
     if(this.checkIfPassable(-1,0)){
-      this.floor[playerY][playerX].playerLocation = " ";
-      playerY -= 1;
+      this.floor[this.playerY][this.playerX].playerLocation = " ";
+      this.playerY -= 1;
     }
   }else if(direction === "s"){
     if(this.checkIfPassable(+1,0)){
-      this.floor[playerY][playerX].playerLocation = " ";
-      playerY += 1;
+      this.floor[this.playerY][this.playerX].playerLocation = " ";
+      this.playerY += 1;
     }
   }else if(direction === "e"){
     if(this.checkIfPassable(0,+1)){
-      this.floor[playerY][playerX].playerLocation = " ";
-      playerX += 1;
+      this.floor[this.playerY][this.playerX].playerLocation = " ";
+      this.playerX += 1;
     }
   }else if(direction === "w"){
     if(this.checkIfPassable(0,-1)){
-      this.floor[playerY][playerX].playerLocation = " ";
-      playerX -= 1;
+      this.floor[this.playerY][this.playerX].playerLocation = " ";
+      this.playerX -= 1;
     }
   }
 
-  this.floor[playerY][playerX].playerLocation = "@";
-  if(this.floor[playerY][playerX].seenRoom === false){
-    this.floor[playerY][playerX].findLightLevel();
+  this.floor[this.playerY][this.playerX].playerLocation = "@";
+  if(this.floor[this.playerY][this.playerX].seenRoom === false){
+    this.floor[this.playerY][this.playerX].findLightLevel();
   }
-  this.floor[playerY][playerX].seenRoom = true;
+  this.floor[this.playerY][this.playerX].seenRoom = true;
   $("span").remove();
 }
 
 Vault.prototype.checkIfPassable = function(checkY, checkX) {
-  if(checkY === -1 && this.floor[playerY][playerX].doorN === "|"){
-    if(this.floor[playerY + checkY][playerX].doorS === "|"){
+  if(checkY === -1 && this.floor[this.playerY][this.playerX].doorN === "|"){
+    if(this.floor[this.playerY + checkY][this.playerX].doorS === "|"){
       return true;
-    }else if(this.floor[playerY + checkY][playerX].doorS === "-" && keys>0){
-      this.floor[playerY + checkY][playerX].doorS = "|";
+    }else if(this.floor[this.playerY + checkY][this.playerX].doorS === "-" && keys>0){
+      this.floor[this.playerY + checkY][this.playerX].doorS = "|";
       keys -=1;
       return true;
     }
-  }else if(checkY === +1 && this.floor[playerY][playerX].doorS === "|"){
-    if(this.floor[playerY + checkY][playerX].doorN === "|"){
+  }else if(checkY === +1 && this.floor[this.playerY][this.playerX].doorS === "|"){
+    if(this.floor[this.playerY + checkY][this.playerX].doorN === "|"){
       return true;
-    }else if(this.floor[playerY + checkY][playerX].doorN === "-" && keys>0){
-      this.floor[playerY + checkY][playerX].doorN = "|";
+    }else if(this.floor[this.playerY + checkY][this.playerX].doorN === "-" && keys>0){
+      this.floor[this.playerY + checkY][this.playerX].doorN = "|";
       keys -=1;
       return true;
     }
-  }else if(checkX === +1 && this.floor[playerY][playerX].doorE === "-"){
-    if(this.floor[playerY][playerX + checkX].doorW === "-"){
+  }else if(checkX === +1 && this.floor[this.playerY][this.playerX].doorE === "-"){
+    if(this.floor[this.playerY][this.playerX + checkX].doorW === "-"){
       return true;
-    }else if(this.floor[playerY][playerX + checkX].doorW === "|" && keys>0){
-      this.floor[playerY][playerX + checkX].doorW = "-";
+    }else if(this.floor[this.playerY][this.playerX + checkX].doorW === "|" && keys>0){
+      this.floor[this.playerY][this.playerX + checkX].doorW = "-";
       keys -=1;
       return true;
     }
-  }else if(checkX === -1 && this.floor[playerY][playerX].doorW === "-"){
-    if(this.floor[playerY][playerX + checkX].doorE === "-"){
+  }else if(checkX === -1 && this.floor[this.playerY][this.playerX].doorW === "-"){
+    if(this.floor[this.playerY][this.playerX + checkX].doorE === "-"){
       return true;
-    }else if(this.floor[playerY][playerX + checkX].doorE === "|" && keys>0){
-      this.floor[playerY][playerX + checkX].doorE = "-";
+    }else if(this.floor[this.playerY][this.playerX + checkX].doorE === "|" && keys>0){
+      this.floor[this.playerY][this.playerX + checkX].doorE = "-";
       keys -=1;
       return true;
     }
@@ -200,11 +200,11 @@ Vault.prototype.checkIfPassable = function(checkY, checkX) {
 }
 
 Vault.prototype.updateSanity = function(){
-  if(this.floor[playerY][playerX].lightLevel === "bright" || flashlightState === "high"){
-  }else if(this.floor[playerY][playerX].lightLevel === "dim" || flashlightState === "on"){
+  if(this.floor[this.playerY][this.playerX].lightLevel === "bright" || flashlightState === "high"){
+  }else if(this.floor[this.playerY][this.playerX].lightLevel === "dim" || flashlightState === "on"){
     sanity -= 1;
     console.log("Sanity - 1")
-  }else if(this.floor[playerY][playerX].lightLevel === "flickering"){
+  }else if(this.floor[this.playerY][this.playerX].lightLevel === "flickering"){
     sanity -= 2;
     console.log("Sanity - 2")
   }else{
@@ -250,8 +250,12 @@ function initializeVault() {
 }
 
 function drawHUD(expoOutput) {
+
+  var xCoord = vaultArray[currentVault].playerX
+  var yCoord = vaultArray[currentVault].playerY
+
   $("#HUD_con").append("<span>" + expoOutput + "</span>");
-  $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[playerY][playerX].lightLevel + ".</span><br><br>");
+  $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
   $("#HUD_con").append("<span>Keys: " + keys + "</span><br>");
   $("#HUD_con").append("<span>Batteries: " + batteries + "</span><br><br>");
 
@@ -362,12 +366,12 @@ $(document).ready(function() {
   drawHUD("It's cold. That's the first thing you notice. Cold, and wrong. The air smells like ozone and oil, and the light seems... less, somehow. Not as complete. It takes several moments before you realize that you don't know where you are, or how you came to be here.");
 
   //Submit behavior for user input form
-  $("#console_form").submit(function(event) {
-    event.preventDefault();
-    var userInput = $("#console_input").val().toLowerCase();
-
-    // playerConsole(userInput);
-
-    $("#console_form")[0].reset();
-  })
+  // $("#console_form").submit(function(event) {
+  //   event.preventDefault();
+  //   var userInput = $("#console_input").val().toLowerCase();
+  //
+  //   // playerConsole(userInput);
+  //
+  //   $("#console_form")[0].reset();
+  // })
 })
