@@ -6,12 +6,16 @@ body{
 }
 
 
-#visible{
+.visible{
   color: #00e600;
 }
 
-#player_span {
+#player {
   color: white;
+}
+
+.block{
+  color: #ccffcc;
 }
 
 .form-control{

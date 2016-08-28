@@ -23,12 +23,15 @@
 //   this.lightLevel = "";
 // }
 
+var visibleArray = [];
+var perimeterArray = [];
+
 // Justin's Global Variables
 var firstFloor = [];
 var firstfirstFloorList = [];
 var firstWallList = [];
-var playerx = 0;
-var playery = 0;
+var playerX = 0;
+var playerY = 0;
 var mapArray = [];
 var yMax;
 var xMax;
@@ -42,26 +45,26 @@ var xMax;
   var hallLengthMin = 10;
   var hallLengthMax = 21;
   // Line of Sight
-  var baseSightLength = 10;
-  var sightLength = baseSightLength;
+  var sightLength = 10
+  var sightBound = 2 * sightLength + 1;
 
 // Master floor creation function
 function createFloor(){
   for(var y = 0; y < yAxis; ++y){
-    firstFloor[y] = [];
+    mapArray[y] = [];
     for(var x = 0; x < xAxis; ++x){
-      firstFloor[y][x] = 'X';
+      mapArray[y][x] = 'X';
     }
   }
 
   // Inserts a start point in the center of the map
   var yOrigin = Math.floor(yAxis/2);
   var xOrigin = Math.floor(xAxis/2);
-  firstFloor[yOrigin][xOrigin] = '.';
+  mapArray[yOrigin][xOrigin] = '.';
 
   // Place player at center of the map
-  playery = yOrigin;
-  playerx = xOrigin;
+  playerY = yOrigin;
+  playerX = xOrigin;
 
   // Creates walls around random start point
   for(var i = 0; i < complexity; ++i){
@@ -88,13 +91,14 @@ function createFloor(){
   insertWalls();
 
   // Inserts player icon.
-  firstFloor[playery][playerx] = "@";
+  mapArray[playerY][playerX] = "@";
 
   // Removes all Xs from the map array and replaces them with "&nbsp;"
   removeDirt();
 
   // Draws map
-  drawFloor();
+  checkSight();
+  drawMap();
 };
 
 // Takes in a character, finds all instances of the character in the map and creates a new array with their locations
@@ -103,7 +107,7 @@ function createIndex(char) {
 
   for(var y = 0; y < yAxis; ++y){
     for(var x = 0; x < xAxis; ++x){
-      if(firstFloor[y][x] === char) {
+      if(mapArray[y][x] === char) {
         index.push([y,x]);
       }
     }
@@ -124,8 +128,8 @@ function insertWalls(){
     for(var y = -1; y <= 1; ++y) {
       for(var x = -1; x <= 1; ++x) {
         if(currentY + y >= 0 && currentY + y < yAxis && currentX + x >= 0 && currentX + x < xAxis)
-        if(firstFloor[currentY + y][currentX + x] === "X"){
-          firstFloor[currentY + y][currentX + x] = "#";
+        if(mapArray[currentY + y][currentX + x] === "X"){
+          mapArray[currentY + y][currentX + x] = "#";
         }
       }
     }
@@ -138,13 +142,13 @@ function insertWalls(){
 // Draws bedrock perimeter around map
 function drawPerimeter(){
   for(var x = 0; x < xAxis; ++x){
-    firstFloor[0][x] = "B";
-    firstFloor[yAxis-1][x] = "B";
+    mapArray[0][x] = "B";
+    mapArray[yAxis-1][x] = "B";
   }
 
   for(var y = 0; y < yAxis; ++y){
-    firstFloor[y][0] = "B";
-    firstFloor[y][xAxis-1] = "B";
+    mapArray[y][0] = "B";
+    mapArray[y][xAxis-1] = "B";
   }
 };
 
@@ -165,22 +169,22 @@ function insertTunnel(origin) {
 
       if(directionArray[direction] === "n" && yOrigin-length >=0) {
         for(var i = 1; i < length + 1; ++i){
-          firstFloor[yOrigin - i][xOrigin] = ".";
+          mapArray[yOrigin - i][xOrigin] = ".";
         }
         increment = 5;
       } else if(directionArray[direction] === "s" && yOrigin + length < yAxis) {
         for(var i = 1; i < length + 1; ++i){
-          firstFloor[yOrigin + i][xOrigin] = ".";
+          mapArray[yOrigin + i][xOrigin] = ".";
         }
         increment = 5;
       } else if(directionArray[direction] === "e" && xOrigin + length < xAxis) {
         for(var i = 1; i < length + 1; ++i){
-          firstFloor[yOrigin][xOrigin + i] = ".";
+          mapArray[yOrigin][xOrigin + i] = ".";
         }
         increment = 5;
       } else if(xOrigin - length >= 0){
         for(var i = 1; i < length + 1; ++i){
-          firstFloor[yOrigin][xOrigin - i] = ".";
+          mapArray[yOrigin][xOrigin - i] = ".";
         }
         increment = 5;
       } else {
@@ -189,76 +193,92 @@ function insertTunnel(origin) {
     } while(increment < 5);
 
     // Replace origin wall with dirt.
-    firstFloor[yOrigin][xOrigin] = ".";
+    mapArray[yOrigin][xOrigin] = ".";
 };
 
 // Removes dirt and replaces it with nbsp
 function removeDirt(){
   for(var y = 0; y < yAxis; ++y){
     for(var x = 0; x < xAxis; ++x) {
-      if(firstFloor[y][x] === "X"){
-        firstFloor[y][x] = "&nbsp;";
+      if(mapArray[y][x] === "X"){
+        mapArray[y][x] = "&nbsp;";
       }
     }
   }
 };
 
-function drawFloor(){
-  // Clears map
-  $("span").remove();
-  $("br").remove();
+// Legacy code that draws entire floor, being left in for testing purposes.
 
-  var y = 0;
-  var x = 0;
-  yMax = yAxis;
-  var yMin = 0;
-  xMax = xAxis;
-  var xMin = 0;
-
-  mapArray = [];
-
-  if(playery - sightLength > 0){
-    y = playery - sightLength;
-    yMin = y;
-  }
-  if(playerx - sightLength > 0){
-    x = playerx - sightLength;
-    xMin = x;
-  }
-  if(playery + sightLength < yAxis){
-    yMax = playery+sightLength;
-  }
-  if(playerx + sightLength < xAxis){
-    xMax = playerx+sightLength;
-  }
-
-  for(var tempY = 0; tempY < yMax - yMin; ++tempY){
-    mapArray[tempY]=[];
-    for(tempX = 0; tempX <  xMax - xMin; ++tempX){
-      mapArray[tempY][tempX]=firstFloor[y + tempY][x + tempX];
-    }
-  }
-
-  checkSight(sightLength);
-  drawMap();
-};
+// function drawFloor(){
+//   // Clears map
+//   $("span").remove();
+//   $("br").remove();
+//
+//   var y = 0;
+//   var x = 0;
+//   yMax = yAxis;
+//   var yMin = 0;
+//   xMax = xAxis;
+//   var xMin = 0;
+//
+//   mapArray = [];
+//
+//   if(playerY - sightLength > 0){
+//     y = playerY - sightLength;
+//     yMin = y;
+//   }
+//   if(playerX - sightLength > 0){
+//     x = playerX - sightLength;
+//     xMin = x;
+//   }
+//   if(playerY + sightLength < yAxis){
+//     yMax = playerY+sightLength;
+//   }
+//   if(playerX + sightLength < xAxis){
+//     xMax = playerX+sightLength;
+//   }
+//
+//   for(var tempY = 0; tempY < yMax - yMin; ++tempY){
+//     mapArray[tempY]=[];
+//     for(tempX = 0; tempX <  xMax - xMin; ++tempX){
+//       mapArray[tempY][tempX]=firstFloor[y + tempY][x + tempX];
+//     }
+//   }
+//
+//   checkSight(sightLength);
+//   drawMap();
+// };
 
 //Begin LoS Functions
-function checkSight(offset) {
 
-  var perimeterArray = [];
-  for(var x = 0; x < mapArray.length; ++x){
-    perimeterArray.push([mapArray.length - 1,x]);
-    perimeterArray.push([0,x]);
-    perimeterArray.push([x,mapArray.length - 1]);
-    perimeterArray.push([x,0]);
+// Draws only the visible area of the map
+
+function drawMap() {
+  $("#main_con").text("");
+
+  // Loops through the visible map area
+
+  for(var y = 0; y <= sightBound; ++y){
+    for(var x = 0; x <= sightBound; ++x){
+
+      //Draws visibleArray with appropriate color markups.
+
+      if(visibleArray[y][x] === "@"){
+          $("#main_con").append("<span id='player'>@<span>");
+      }else if(visibleArray[y][x] === "#"){
+        $("#main_con").append("<span class='block'>#<span>");
+      }else if(visibleArray[y][x] === "B"){
+        $("#main_con").append("<span class='block'>#<span>");
+      }else{
+        $("#main_con").append("<span class='visible'>" + visibleArray[y][x] + "</span>");
+      }
+    }
+  $("#main_con").append("<br>");
   }
 
-  for(var i = 0; i < perimeterArray.length; ++i){
-      drawline(0,0,perimeterArray[i][1] - offset,perimeterArray[i][0] - offset);
-  }
+}
 
-};
+// Determines the coordinates for drawing a line from x0, y0 to x1,y1. Terminates if plot() returns a false.
 
 var drawline = function(x0,y0,x1,y1){
 	var tmp;
@@ -282,6 +302,8 @@ var drawline = function(x0,y0,x1,y1){
   var ystep = y0 < y1 ? 1:-1;
   var y = y0;
 
+  // Goes down the line's coordinates, starting from the origin. If plot returns a false, drawline() terminates
+
   for(var x=x0;x<=x1;x++){
   	if(!(steep ? plot(y,sign*x) : plot(sign*x,y))) return;
     err = (err - dy);
@@ -289,48 +311,124 @@ var drawline = function(x0,y0,x1,y1){
     	y+=ystep;
       err+=dx;
     }
+
   }
 }
+
+//Used by drawline to plot the current coordinates. Checks to see if current coordinates are a wall, and if so, sends back a false and terminates drawline(). Automatically populates visibleArray with the matching data in mapArray for the current coordinates regardless of outcome.
 
 var plot = function(x,y){
-  if(playerx + x >= xMax || playery + y >= yMax || playerx + x < 0 || playery + y < 0 || sightLength + y <= 0 || sightLength + x < 0){
-    return false;
-  }
-  // BORDER PROBLEM - when the mapArray doesn't have an index corresponding to sightLength+x or sightLength+y, it throws an error. Exiting the function if there isn't a corresponding index prevents the function from throwing an error, but the LOS is then screwed up. Solutions?
-  // else if(!mapArray[sightLength+x][sightLength+y]){
-  else if(sightLength + x > mapArray.length){
-    return false;
+
+  // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
+
+  visibleArray[sightLength+y][sightLength+x] = mapArray[playerY+y][playerX+x];
+  if(mapArray[playerY+y][playerX+x] !== "#"){
+    return true;
   }
   else{
-    if(mapArray[sightLength+x][sightLength+y].match(/@/g)){
-      mapArray[sightLength+x][sightLength+y] = "<span id='player_span'>" + mapArray[sightLength+x][sightLength+y] + "</span>";
-      return true;
-    }else if(mapArray[sightLength+x][sightLength+y].match(/#/g) === null){
-      mapArray[sightLength+x][sightLength+y] = "<span id='visible'>" + mapArray[sightLength+x][sightLength+y] + "</span>";
-      return true;
-    }
-    else{
-      mapArray[sightLength+x][sightLength+y] = "<span id='visible'>" + mapArray[sightLength+x][sightLength+y] + "</span>";
-      return false;
-    }
+    return false;
   }
 }
 
-function drawMap() {
-  $("#map").text("");
-  for(y = 0; y < mapArray.length; ++y){
-    for(x = 0; x < mapArray.length; ++x){
-      if(mapArray[y][x] === "#"){
-        $("#map").append("<span id='block'>" + mapArray[y][x] + "</span>");
-      }else if(mapArray[y][x] === "@"){
-        $("#map").append("<span id='player_span'>" + mapArray[y][x] + "</span>");
-      }else{
-        $("#map").append(mapArray[y][x]);
-      }
+// Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
+
+function checkSight() {
+
+  //These variables are what will prevent plot() from checking undefined array locations.
+
+  var boundNorth;
+  var boundSouth;
+  var boundEast;
+  var boundWest;
+
+// The following for loops are checking for terminal objects (i.e. level boundaries) in each of the cardinal directions and, upon finding them, setting the boundVar to their relative distance from the player. Otherwise, the boundVar will equal the sightLength
+
+  for(var i = 0; i >= sightLength * -1; --i){
+    boundNorth = i;
+    if(mapArray[playerY + i][playerX].match(/B/) !== null){
+      break;
     }
-  $("#map").append("<br>");
   }
+
+  for(var i = 0; i <= sightLength; ++i){
+    boundSouth = i;
+    if(mapArray[playerY + i][playerX].match(/B/) !== null){
+      break;
+    }
+  }
+
+  for(var i = 0; i <= sightLength; ++i){
+    boundEast = i;
+    if(mapArray[playerY][playerX + i].match(/B/) !== null){
+      break;
+    }
+  }
+
+  for(var i = 0; i >= sightLength * -1; --i){
+    boundWest = i;
+    if(mapArray[playerY][playerX + i].match(/B/) !== null){
+      break;
+    }
+  }
+
+// The following for loops build an array of perimeter coordinates using the boundaries established by the boundVars. This ensures that plot() will never attempt to look outside of mapArray's defined data.  Each loop handles 2 of the 8 octants.
+
+  //    Octants:
+  //     \1|2/
+  //     8\|/3
+  //     --+--
+  //     7/|\4
+  //     /8|5\
+
+  perimeterArray = [];
+
+  // Builds octant 1 and 6 perimeter values
+  for(var i = 0; i >= boundWest; --i){
+    perimeterArray.push([boundNorth,i]);
+    perimeterArray.push([boundSouth,i]);
+  }
+
+  // Builds octant 8 and 3 perimter values
+  for(var i = 0; i >= boundNorth; --i){
+    perimeterArray.push([i,boundWest]);
+    perimeterArray.push([i,boundEast]);
+  }
+
+  // Builds octant 2 and 5 perimter values
+  for(var i = 0; i <= boundEast; ++i){
+    perimeterArray.push([boundNorth, i]);
+    perimeterArray.push([boundSouth, i]);
+  }
+
+  // Builds octant 4 and 7 perimter values
+  for(var i = 0; i <= boundSouth; ++i){
+    perimeterArray.push([i, boundWest]);
+    perimeterArray.push([i, boundEast]);
+  }
+
+  // Resets and builds visibleArray at a constant size, and populates it with blank (i.e. invisible) spaces
+
+  visibleArray = [];
+
+  for(var i = 0; i <= sightBound; ++i) {
+    visibleArray[i] = [];
+    for(var j = 0; j <= sightBound; ++j){
+      visibleArray[i][j] = "&nbsp;";
+    }
+  }
+
+  // Checks visible area within allowed boundaries.
+
+  for(var i = 0; i < perimeterArray.length ; ++i){
+    var toY = perimeterArray[i][0];
+    var toX = perimeterArray[i][1];
+
+    // (origin y, origin x, draw to y, draw to x) ??
+    drawline(0,0,toX,toY);
+  }
+
 }
+
 
 // Always active keyboard input
 window.addEventListener("keypress", doKeyDown, false);
@@ -358,12 +456,13 @@ function doKeyDown(event){
 
 // Called upon particular keypress: takes in input, checks for viable movement, and redraws map if viable
 function playerMovement(checkY, checkX){
-  if(firstFloor[playery + checkY][playerx + checkX] === "."){
-    firstFloor[playery][playerx] = '.';
-    playery += checkY;
-    playerx += checkX;
-    firstFloor[playery][playerx] = "@";
-    drawFloor();
+  if(mapArray[playerY + checkY][playerX + checkX] === "."){
+    mapArray[playerY][playerX] = '.';
+    playerY += checkY;
+    playerX += checkX;
+    mapArray[playerY][playerX] = "@";
+    checkSight();
+    drawMap();
   } else{
     console.log("invalid");
   }
