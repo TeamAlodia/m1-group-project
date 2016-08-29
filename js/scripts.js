@@ -9,6 +9,7 @@ var vaultArray = [];
 var currentVault = -1;
 var inVault = false;
 var levelArray = [];
+var currentExpo;
 
 var Vault = function(yAxisLength, xAxisLength) {
   this.playerX = 4;
@@ -251,7 +252,7 @@ function drawHUD(expoOutput) {
   // var yCoord = vaultArray[currentVault].playerY
   //
   if(expoOutput){
-    $("#log").append("<li class='visible' id='expo'>" + expoOutput + "</li>");
+    $("#log").append("<li class='lit' id='expo'>" + expoOutput + "</li>");
   }
   // $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
   $("#items").text("Keys: " + keys + " Batteries: " + batteries);
@@ -423,7 +424,8 @@ Level.prototype.createLevel = function() {
 
 
 // Links keyboard input with actions: currently just movement
-function doKeyDown(event){
+function turnLogic(event){
+  // Flashlight Power Settings
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
     flashlightState = "lit";
     console.log("lit")
@@ -448,7 +450,6 @@ function doKeyDown(event){
     updateFlashlight();
     vaultArray[currentVault].updateSanity();
     vaultArray[currentVault].drawVault();
-    drawHUD();
   }else{
     if (event.keyCode === 119){
       levelArray[0].currentDirection = "n";
@@ -477,14 +478,24 @@ function doKeyDown(event){
     }
   }
 
+  // Draw HUD
+  drawHUD(currentExpo);
+
+  // Shadow Movement
+  for (var i = 0; i < levelArray[0].shadowsArray.length; ++i) {
+    levelArray[0].shadowsArray[i].shadowMovement();
+  }
+
+  // Draw Player Sight
+  levelArray[0].checkSight();
+  levelArray[0].drawMap();
+
 };
 
 function playerMovement(checkY, checkX){
-  drawHUD();
-
   // Picks up item in target space
   if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[C-L]|A|b|k/)){
-    levelArray[0].itemPickUp(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX]);
+    currentExpo = levelArray[0].itemPickUp(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX]);
   }
 
   // // Encounters a Shadow in target space
@@ -498,13 +509,7 @@ function playerMovement(checkY, checkX){
     levelArray[0].playerY += checkY;
     levelArray[0].playerX += checkX;
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = "@";
-    for (var i = 0; i < levelArray[0].shadowsArray.length; ++i) {
-      levelArray[0].shadowsArray[i].shadowMovement();
-    }
-    levelArray[0].checkSight();
-    levelArray[0].drawMap();
   }
-
 };
 
 Shadow.prototype.shadowMovement = function(){
@@ -544,30 +549,31 @@ Level.prototype.itemPickUp = function(item){
     "Black feather pen: It looks like it came from a crow? Or maybe a raven?"
   ];
   if(item === "A"){
-    drawHUD(specialItemExpo[0]);
+    return specialItemExpo[0];
   } else if (item === "L") {
-    drawHUD(specialItemExpo[1]);
+    return specialItemExpo[1];
   } else if (item === "C") {
-    drawHUD(specialItemExpo[2]);
+    return specialItemExpo[2];
   } else if (item === "D") {
-    drawHUD(specialItemExpo[3]);
+    return specialItemExpo[3];
   } else if (item === "E") {
-    drawHUD(specialItemExpo[4]);
+    return specialItemExpo[4];
   } else if (item === "F") {
-    drawHUD(specialItemExpo[5]);
+    return specialItemExpo[5];
   } else if (item === "G") {
-    drawHUD(specialItemExpo[6]);
+    return specialItemExpo[6];
   } else if (item === "H") {
-    drawHUD(specialItemExpo[7]);
+    return specialItemExpo[7];
   } else if (item === "J") {
-    drawHUD(specialItemExpo[8]);
+    return specialItemExpo[8];
   } else if (item === "K") {
-    drawHUD(specialItemExpo[9]);
+    return specialItemExpo[9];
   } else if (item === "k") {
     keys += 1;
   } else if (item === "b") {
     batteries += 1;
   }
+
 };
 
 // Takes in a character, finds all instances of the character in the map and creates a new array with their locations
@@ -989,7 +995,7 @@ Level.prototype.checkSight = function() {
 // ----------------------------------
 
 // Always active keyboard input
-window.addEventListener("keypress", doKeyDown, false);
+window.addEventListener("keypress", turnLogic, false);
 
 // Calls map creation
 window.onload = function () {
