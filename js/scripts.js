@@ -328,7 +328,7 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.sightBound = 2 * sightLength + 1;
   this.visibleArray = [];
   this.perimeterArray = [];
-  this.itemCatalog = ["A","B","C","D","E","F","G","H","J","K"];
+  this.itemCatalog = ["A","L","C","D","E","F","G","H","J","K"];
   this.shadowCount = Math.floor(complexity / 10);
   this.shadows = [];
 }
@@ -453,7 +453,7 @@ function playerMovement(checkY, checkX){
   drawHUD();
 
   // Picks up item in target space
-  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|b|k/)){
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[C-L]|A|b|k/)){
     levelArray[0].itemPickUp(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX]);
   }
 
@@ -463,17 +463,52 @@ function playerMovement(checkY, checkX){
   }
 
   // Moves player to new space
-  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|b|k|\./)){
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[C-L]|A|b|k|\./)){
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = '.';
     levelArray[0].playerY += checkY;
     levelArray[0].playerX += checkX;
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = "@";
-    // levelArray[0].shadowMovement();
+    levelArray[0].shadowMovement();
     levelArray[0].checkSight();
     levelArray[0].drawMap();
   } else{
     console.log("invalid");
   }
+
+};
+
+Level.prototype.shadowMovement = function(){
+  this.shadows.forEach(function(shadow){
+    if(Math.pow(levelArray[0].playerY-shadow[0],2) + Math.pow(levelArray[0].playerX-shadow[1],2) <= Math.pow(levelArray[0].sightLength,2)) {
+
+      if(shadow[0] > levelArray[0].playerY){
+        if(levelArray[0].mapArray[shadow[0] - 1][shadow[1]] != "#"){
+          shadow[0] -= 1;
+          levelArray[0].mapArray[shadow[0]+1][shadow[1]] = ".";
+          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+        }
+      } else {
+        if(levelArray[0].mapArray[shadow[0] + 1][shadow[1]] != "#"){
+          shadow[0] += 1;
+          levelArray[0].mapArray[shadow[0]-1][shadow[1]] = ".";
+          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+        }
+      }
+      if(shadow[1]>levelArray[0].playerX){
+        if(levelArray[0].mapArray[shadow[0]][shadow[1] - 1] != "#"){
+          shadow[1] -= 1;
+          levelArray[0].mapArray[shadow[0]][shadow[1]+1] = ".";
+          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+        }
+      } else {
+        if(levelArray[0].mapArray[shadow[0]][shadow[1] + 1] != "#"){
+          shadow[1] += 1;
+          levelArray[0].mapArray[shadow[0]][shadow[1]-1] = ".";
+          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+        }
+      }
+    }
+  });
 };
 
 Level.prototype.shadowEncounter = function(){
@@ -497,7 +532,7 @@ Level.prototype.itemPickUp = function(item){
   ];
   if(item === "A"){
     drawHUD(specialItemExpo[0]);
-  } else if (item === "B") {
+  } else if (item === "L") {
     drawHUD(specialItemExpo[1]);
   } else if (item === "C") {
     drawHUD(specialItemExpo[2]);
@@ -717,13 +752,14 @@ Level.prototype.drawline = function(x0,y0,x1,y1){
   // Goes down the line's coordinates, starting from the origin. If plot returns a false, drawline() terminates
 
   for(var x=x0;x<=x1;x++){
-  	if(!(steep ? this.plot(y,sign*x) : this.plot(sign*x,y))) return;
+  	if(!(steep ? this.plot(y,sign*x) : this.plot(sign*x,y))) {
+      return;
+    }
     err = (err - dy);
     if(err < 0){
     	y+=ystep;
       err+=dx;
     }
-
   }
 }
 
