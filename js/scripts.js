@@ -331,6 +331,10 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.itemCatalog = ["A","L","C","D","E","F","G","H","J","K"];
   this.shadowCount = 0;
   this.shadows = [];
+  this.flashlightPerimeter = [];
+  this.currentDirection = "n";
+  this.flashlightArray = [];
+  this.checkLight;
 }
 
 Level.prototype.createLevel = function() {
@@ -429,23 +433,32 @@ function doKeyDown(event){
     drawHUD();
   }else{
     if (event.keyCode === 119){
+      levelArray[0].currentDirection = "n";
       playerMovement(-1, 0);
     } else if (event.keyCode === 97){
+      levelArray[0].currentDirection = "w";
       playerMovement(0, -1);
     } else if (event.keyCode === 100){
+      levelArray[0].currentDirection = "e";
       playerMovement(0, 1);
     } else if (event.keyCode === 115){
+      levelArray[0].currentDirection = "s";
       playerMovement(1, 0);
     }else if (event.keyCode === 113){
+      levelArray[0].currentDirection = "nw";
       playerMovement(-1, -1);
     }else if (event.keyCode === 101){
+      levelArray[0].currentDirection = "ne";
       playerMovement(-1, 1);
     }else if (event.keyCode === 122){
+      levelArray[0].currentDirection = "sw";
       playerMovement(1, -1);
     }else if (event.keyCode === 99){
+      levelArray[0].currentDirection = "se";
       playerMovement(1, 1);
     }
   }
+  console.log(levelArray[0].currentDirection);
 
 };
 
@@ -712,12 +725,12 @@ Level.prototype.drawMap = function() {
 
       if(this.visibleArray[y][x] === "@"){
           $("#main_con").append("<span id='player'>@<span>");
-      }else if(this.visibleArray[y][x] === "#"){
+      }else if(this.visibleArray[y][x].match(/#/) !== null){
         $("#main_con").append("<span class='block'>#<span>");
       }else if(this.visibleArray[y][x] === "B"){
-        $("#main_con").append("<span class='block'>#<span>");
+        $("#main_con").append("<span class='visible block'>#<span>");
       }else{
-        $("#main_con").append("<span class='visible'>" + this.visibleArray[y][x] + "</span>");
+        $("#main_con").append("<span class='lit'>" + this.visibleArray[y][x] + "</span>");
       }
     }
   $("#main_con").append("<br>");
@@ -769,7 +782,11 @@ Level.prototype.plot = function(x,y){
 
   // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
 
-  this.visibleArray[this.sightLength+y][this.sightLength+x] = this.mapArray[this.playerY+y][this.playerX+x];
+  if(this.checkLight){
+    this.visibleArray[this.sightLength+y][this.sightLength+x] = "<span class='visible'>" +  this.mapArray[this.playerY+y][this.playerX+x] + "<span>";
+  }else{
+    this.visibleArray[this.sightLength+y][this.sightLength+x] = this.mapArray[this.playerY+y][this.playerX+x];
+  }
   if(this.mapArray[this.playerY+y][this.playerX+x] !== "#"){
     return true;
   }
@@ -779,6 +796,73 @@ Level.prototype.plot = function(x,y){
 }
 
 // Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
+
+Level.prototype.checkFlashlight = function(boundNorth, boundSouth, boundEast, boundWest) {
+  var tempArray = [];
+
+  if(this.currentDirection === "n"){
+    for(var i = 0; i >= boundWest; --i){
+      tempArray.push([boundNorth,i]);
+    }
+    for(var i = 0; i <= boundEast; ++i){
+      tempArray.push([boundNorth,i]);
+    }
+  }else if(this.currentDirection === "s"){
+    for(var i = 0; i >= boundWest; --i){
+      tempArray.push([boundSouth,i]);
+    }
+    for(var i = 0; i <= boundEast; ++i){
+      tempArray.push([boundSouth,i]);
+    }
+  }else if(this.currentDirection === "e"){
+    for(var i = 0; i >= boundNorth; --i){
+      tempArray.push([i,boundEast]);
+    }
+    for(var i = 0; i <= boundSouth; ++i){
+      tempArray.push([i,boundEast]);
+    }
+  }else if(this.currentDirection === "w"){
+    for(var i = 0; i >= boundNorth; --i){
+      tempArray.push([i,boundWest]);
+    }
+    for(var i = 0; i <= boundSouth; ++i){
+      tempArray.push([i,boundWest]);
+    }
+  }else if(this.currentDirection === "nw"){
+    for(var i = 0; i >= boundNorth; --i){
+      tempArray.push([boundNorth,i]);
+    }
+    for(var i = 0; i >= boundWest; --i){
+      tempArray.push([i,boundWest]);
+    }
+  }else if(this.currentDirection === "ne"){
+    for(var i = 0; i >= boundNorth; --i){
+      tempArray.push([boundNorth,i * -1]);
+    }
+    for(var i = 0; i <= boundEast; ++i){
+      tempArray.push([i * -1,boundEast]);
+    }
+  }else if(this.currentDirection === "se"){
+    for(var i = 0; i <= boundSouth; ++i){
+      tempArray.push([boundSouth,i]);
+    }
+    for(var i = 0; i <= boundEast; ++i){
+      tempArray.push([i,boundEast]);
+    }
+  }else if(this.currentDirection === "sw"){
+    for(var i = 0; i <= boundSouth; ++i){
+      tempArray.push([boundSouth,i * -1]);
+    }
+    for(var i = 0; i >= boundWest; --i){
+      tempArray.push([i * -1,boundWest]);
+    }
+  }
+
+  console.log(tempArray)
+  return tempArray;
+
+
+}
 
 Level.prototype.checkSight = function() {
 
@@ -826,7 +910,7 @@ Level.prototype.checkSight = function() {
   //     8\|/3
   //     --+--
   //     7/|\4
-  //     /8|5\
+  //     /6|5\
 
   this.perimeterArray = [];
 
@@ -857,6 +941,7 @@ Level.prototype.checkSight = function() {
   // Resets and builds visibleArray at a constant size, and populates it with blank (i.e. invisible) spaces
 
   this.visibleArray = [];
+  this.flashlightPerimeter = this.checkFlashlight(boundNorth, boundSouth, boundEast, boundWest)
 
   for(var i = 0; i <= this.sightBound; ++i) {
     this.visibleArray[i] = [];
@@ -867,9 +952,21 @@ Level.prototype.checkSight = function() {
 
   // Checks visible area within allowed boundaries.
 
+  this.checkLight = false;
+
   for(var i = 0; i < this.perimeterArray.length ; ++i){
     var toY = this.perimeterArray[i][0];
     var toX = this.perimeterArray[i][1];
+
+    // (origin y, origin x, draw to y, draw to x) ??
+    this.drawline(0,0,toX,toY);
+  }
+
+  this.checkLight = true;
+
+  for(var i = 0; i < this.flashlightPerimeter.length ; ++i){
+    var toY = this.flashlightPerimeter[i][0];
+    var toX = this.flashlightPerimeter[i][1];
 
     // (origin y, origin x, draw to y, draw to x) ??
     this.drawline(0,0,toX,toY);
@@ -934,27 +1031,3 @@ window.onload = function () {
 //   checkSight(sightLength);
 //   drawMap();
 // };
-
-//
-// var visibleArray = [];
-// var perimeterArray = [];
-
-// Justin's Global Variables
-
-// var firstfirstFloorList = [];
-// var firstWallList = [];
-// var playerX = 0;
-// var playerY = 0;
-// var mapArray = [];
-
-// Justin's Settings
-  // Map Size
-  // var xAxis = 50;
-  // var yAxis = 50;
-  // var complexity = 30;
-  // Hallway Size
-  // var hallLengthMin = 10;
-  // var hallLengthMax = 21;
-  // Line of Sight
-  // var sightLength = 10
-  // var sightBound = 2 * sightLength + 1;

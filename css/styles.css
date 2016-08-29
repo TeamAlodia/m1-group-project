@@ -7,7 +7,6 @@ body{
 
 .visible{
   color: #00e600;
-  line-height: 10px;
 }
 
 #player_span{
@@ -24,4 +23,9 @@ body{
 
 #door_span{
   color: green;
+}
+
+.lit{
+  color: black;
+  text-shadow: 0 0 5px #ffffe6;
 }
