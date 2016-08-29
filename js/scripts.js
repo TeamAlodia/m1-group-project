@@ -329,7 +329,7 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.visibleArray = [];
   this.perimeterArray = [];
   this.itemCatalog = ["A","L","C","D","E","F","G","H","J","K"];
-  this.shadowCount = Math.floor(complexity / 10);
+  this.shadowCount = 0;
   this.shadows = [];
 }
 
