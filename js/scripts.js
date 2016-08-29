@@ -330,12 +330,29 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.perimeterArray = [];
   this.itemCatalog = ["A","L","C","D","E","F","G","H","J","K"];
   this.shadowCount = complexity / 10;
-  this.shadows = [];
+  this.shadowsArray = [];
   this.flashlightPerimeter = [];
   this.currentDirection = "n";
   this.flashlightArray = [];
   this.checkLight;
 }
+
+var Shadow = function(shadowY, shadowX, strength){
+  this.shadowX = shadowX;
+  this.shadowY = shadowY;
+  this.lastSeen = [];
+  this.strength = strength;
+}
+
+Level.prototype.createShadows = function(){
+  for(var i = 0; i < this.shadowCount; ++i){
+    var newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+    this.yOrigin = newOrigin[0];
+    this.xOrigin = newOrigin[1];
+    this.shadowsArray.push(new Shadow(this.yOrigin, this.xOrigin, 2));
+    this.mapArray[this.yOrigin][this.xOrigin] = "S";
+  }
+};
 
 Level.prototype.createLevel = function() {
   var newOrigin = 0;
@@ -390,10 +407,8 @@ Level.prototype.createLevel = function() {
     }
 
     // Insert shadows
-    for(var i = 0; i < this.shadowCount; ++i){
-      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
-      this.insertShadows(newOrigin);
-    }
+
+    this.createShadows();
 
     // Inserts player icon.
     this.mapArray[this.playerY][this.playerX] = "@";
@@ -470,10 +485,10 @@ function playerMovement(checkY, checkX){
     levelArray[0].itemPickUp(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX]);
   }
 
-  // Encounters a Shadow in target space
-  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/S/)){
-    levelArray[0].shadowEncounter();
-  }
+  // // Encounters a Shadow in target space
+  // if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/S/)){
+  //   levelArray[0].shadowEncounter();
+  // }
 
   // Moves player to new space
   if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[C-L]|A|b|k|\./)){
@@ -481,7 +496,7 @@ function playerMovement(checkY, checkX){
     levelArray[0].playerY += checkY;
     levelArray[0].playerX += checkX;
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = "@";
-    levelArray[0].shadowMovement();
+    // levelArray[0].shadowMovement();
     levelArray[0].checkSight();
     levelArray[0].drawMap();
   } else{
@@ -489,45 +504,45 @@ function playerMovement(checkY, checkX){
   }
 
 };
-
-Level.prototype.shadowMovement = function(){
-  this.shadows.forEach(function(shadow){
-    if(Math.pow(levelArray[0].playerY-shadow[0],2) + Math.pow(levelArray[0].playerX-shadow[1],2) <= Math.pow(levelArray[0].sightLength,2)) {
-
-      if(shadow[0] > levelArray[0].playerY){
-        if(levelArray[0].mapArray[shadow[0] - 1][shadow[1]] != "#"){
-          shadow[0] -= 1;
-          levelArray[0].mapArray[shadow[0]+1][shadow[1]] = ".";
-          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-        }
-      } else {
-        if(levelArray[0].mapArray[shadow[0] + 1][shadow[1]] != "#"){
-          shadow[0] += 1;
-          levelArray[0].mapArray[shadow[0]-1][shadow[1]] = ".";
-          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-        }
-      }
-      if(shadow[1]>levelArray[0].playerX){
-        if(levelArray[0].mapArray[shadow[0]][shadow[1] - 1] != "#"){
-          shadow[1] -= 1;
-          levelArray[0].mapArray[shadow[0]][shadow[1]+1] = ".";
-          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-        }
-      } else {
-        if(levelArray[0].mapArray[shadow[0]][shadow[1] + 1] != "#"){
-          shadow[1] += 1;
-          levelArray[0].mapArray[shadow[0]][shadow[1]-1] = ".";
-          levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-        }
-      }
-    }
-  });
-};
-
-Level.prototype.shadowEncounter = function(){
-  sanity -= 10;
-  drawHUD("AIEEEEEEEE!");
-};
+//
+// Level.prototype.shadowMovement = function(){
+//   this.shadows.forEach(function(shadow){
+//     if(Math.pow(levelArray[0].playerY-shadow[0],2) + Math.pow(levelArray[0].playerX-shadow[1],2) <= Math.pow(levelArray[0].sightLength,2)) {
+//
+//       if(shadow[0] > levelArray[0].playerY){
+//         if(levelArray[0].mapArray[shadow[0] - 1][shadow[1]] != "#"){
+//           shadow[0] -= 1;
+//           levelArray[0].mapArray[shadow[0]+1][shadow[1]] = ".";
+//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+//         }
+//       } else {
+//         if(levelArray[0].mapArray[shadow[0] + 1][shadow[1]] != "#"){
+//           shadow[0] += 1;
+//           levelArray[0].mapArray[shadow[0]-1][shadow[1]] = ".";
+//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+//         }
+//       }
+//       if(shadow[1]>levelArray[0].playerX){
+//         if(levelArray[0].mapArray[shadow[0]][shadow[1] - 1] != "#"){
+//           shadow[1] -= 1;
+//           levelArray[0].mapArray[shadow[0]][shadow[1]+1] = ".";
+//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+//         }
+//       } else {
+//         if(levelArray[0].mapArray[shadow[0]][shadow[1] + 1] != "#"){
+//           shadow[1] += 1;
+//           levelArray[0].mapArray[shadow[0]][shadow[1]-1] = ".";
+//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
+//         }
+//       }
+//     }
+//   });
+// };
+//
+// Level.prototype.shadowEncounter = function(){
+//   sanity -= 10;
+//   drawHUD("AIEEEEEEEE!");
+// };
 
 Level.prototype.itemPickUp = function(item){
   var specialItemExpo = [
@@ -702,13 +717,13 @@ Level.prototype.removeDirt = function() {
   }
 };
 
-Level.prototype.insertShadows = function(origin) {
-  this.yOrigin = origin[0];
-  this.xOrigin = origin[1];
-  this.shadows.push(origin);
-  this.mapArray[this.yOrigin][this.xOrigin] = "S";
-
-}
+// Level.prototype.insertShadows = function(origin) {
+//   this.yOrigin = origin[0];
+//   this.xOrigin = origin[1];
+//   this.shadows.push(origin);
+//   this.mapArray[this.yOrigin][this.xOrigin] = "S";
+//
+// }
 //Begin LoS Functions
 
 // Draws only the visible area of the map
@@ -864,6 +879,10 @@ Level.prototype.checkFlashlight = function(boundNorth, boundSouth, boundEast, bo
 
 }
 
+function between(x, min, max) {
+  return x >= min && x <= max;
+}
+
 Level.prototype.checkSight = function() {
 
   //These variables are what will prevent plot() from checking undefined array locations.
@@ -971,7 +990,30 @@ Level.prototype.checkSight = function() {
     // (origin y, origin x, draw to y, draw to x) ??
     this.drawline(0,0,toX,toY);
   }
+  var signy = 0;
+  var signx = 0;
 
+  for(var i = 0; i < this.shadowsArray.length; ++i){
+
+    var shadowY = this.shadowsArray[i].shadowY;
+    var shadowX = this.shadowsArray[i].shadowX;
+
+    if(between(shadowY, this.playerY - this.sightLength, this.playerY + this.sightLength) && between(shadowX, this.playerX - this.sightLength, this.playerX + this.sightLength)) {
+      if(shadowY >= this.playerY){
+        signy = 1;
+      } else {
+        signy = -1;
+      }
+      if(shadowX >= this.playerX){
+        signx = 1;
+      } else {
+        signx = -1;
+      }
+      this.visibleArray[this.sightLength + ((shadowY - this.playerY))][this.sightLength + ((shadowX - this.playerX))] = "S";
+      console.log("shadow found")
+
+    }
+  }
 }
 
 // ----------------------------------
