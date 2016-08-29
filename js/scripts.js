@@ -326,9 +326,12 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.sightBound = 2 * sightLength + 1;
   this.visibleArray = [];
   this.perimeterArray = [];
+  this.itemCatalog = ["A","B","C","D","E","F","G","H","J","K"];
 }
 
 Level.prototype.createLevel = function() {
+  var newOrigin = 0;
+
     for(var y = 0; y < this.yAxis; ++y){
       this.mapArray[y] = [];
       for(var x = 0; x < this.xAxis; ++x){
@@ -357,7 +360,7 @@ Level.prototype.createLevel = function() {
       this.wallList = this.createIndex('#');
 
       // Takes a random wall location from the wall list
-      var newOrigin = this.wallList[(Math.floor(Math.random() * (this.wallList.length - 1)) + 1)];
+      newOrigin = this.wallList[(Math.floor(Math.random() * (this.wallList.length - 1)) + 1)];
 
       // Takes in the random wall location and inserts a tunnel of variable length
       this.insertTunnel(newOrigin);
@@ -368,6 +371,15 @@ Level.prototype.createLevel = function() {
 
     // Updates map with walls
     this.insertWalls();
+
+    // Inserts Special Items
+    this.insertSpecial();
+
+    // Inserts Items
+    // for(var i = 0; i < this.xAxis/10; ++i){
+    //   newOrigin = this.floorList[(Math.floor(Math.random() * (this.wallList.length-1)) + 1)];
+    //   this.insertItems(newOrigin);
+    // }
 
     // Inserts player icon.
     this.mapArray[this.playerY][this.playerX] = "@";
@@ -428,7 +440,7 @@ function doKeyDown(event){
 };
 
 function playerMovement(checkY, checkX){
-  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX] === "."){
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|\./)){
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = '.';
     levelArray[0].playerY += checkY;
     levelArray[0].playerX += checkX;
@@ -478,16 +490,24 @@ Level.prototype.insertWalls = function() {
   this.drawPerimeter();
 };
 
-// Draws bedrock perimeter around map
-Level.prototype.drawPerimeter = function() {
-  for(var x = 0; x < this.xAxis; ++x){
-    this.mapArray[0][x] = "B";
-    this.mapArray[this.yAxis-1][x] = "B";
-  }
+// Level.prototype.insertItems = function(origin) {
+//   this.yOrigin = origin[0];
+//   this.xOrigin = origin[1];
+//
+// };
 
-  for(var y = 0; y < this.yAxis; ++y){
-    this.mapArray[y][0] = "B";
-    this.mapArray[y][this.xAxis-1] = "B";
+// Inserts special items
+Level.prototype.insertSpecial = function() {
+  var newOrigin = 0;
+  var max = this.floorList.length - 1;
+
+  for(var i = 0; i < this.itemCatalog.length; ++i){
+    newOrigin = this.floorList[(Math.floor(Math.random() * (max)) + 1)];
+
+    this.yOrigin = newOrigin[0];
+    this.xOrigin = newOrigin[1];
+
+    this.mapArray[this.yOrigin][this.xOrigin] = this.itemCatalog[i];
   }
 };
 
@@ -533,6 +553,19 @@ Level.prototype.insertTunnel = function(origin) {
 
     // Replace origin wall with dirt.
     this.mapArray[this.yOrigin][this.xOrigin] = ".";
+};
+
+// Draws bedrock perimeter around map
+Level.prototype.drawPerimeter = function() {
+  for(var x = 0; x < this.xAxis; ++x){
+    this.mapArray[0][x] = "B";
+    this.mapArray[this.yAxis-1][x] = "B";
+  }
+
+  for(var y = 0; y < this.yAxis; ++y){
+    this.mapArray[y][0] = "B";
+    this.mapArray[y][this.xAxis-1] = "B";
+  }
 };
 
 // Removes dirt and replaces it with nbsp
