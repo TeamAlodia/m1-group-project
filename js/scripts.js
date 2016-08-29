@@ -245,6 +245,8 @@ function initializeVault() {
 
 function drawHUD(expoOutput) {
 
+
+  console.log("HUD")
   // var xCoord = vaultArray[currentVault].playerX
   // var yCoord = vaultArray[currentVault].playerY
   //
@@ -425,7 +427,7 @@ function doKeyDown(event){
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
     flashlightState = "lit";
     console.log("lit")
-  }else if(event.keyCode === 115 && flashlightState === "on" && flashlightPower > 0){
+  }else if(event.keyCode === 115 && flashlightState === "lit" && flashlightPower > 0){
     flashlightState = "superlit";
     console.log("superlit")
   }else if(event.keyCode === 115){
