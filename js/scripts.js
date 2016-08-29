@@ -8,31 +8,81 @@ var sanityMeter="";
 var vaultArray = [];
 var currentVault = -1;
 var inVault = false;
+var levelArray = [];
 
-var visibleArray = [];
-var perimeterArray = [];
+var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength) {
+  this.playerX;
+  this.playerY;
+  this.vaultArray = [];
+  this.xOrigin;
+  this.yOrigin;
+  this.wallList = [];
+  this.floorList = [];
+  this.mapArray = [];
+  this.xAxis = xAxis;
+  this.yAxis = yAxis;
+  this.complexity = complexity;
+  this.hallLengthMin = hallLengthMin;
+  this.hallLengthMax = hallLengthMax;
+  this.sightLength = sightLength;
+  this.sightBound = 2 * sightLength + 1;
+  this.visibleArray = [];
+  this.perimeterArray = [];
 
-// Justin's Global Variables
-var firstFloor = [];
-var firstfirstFloorList = [];
-var firstWallList = [];
-var playerX = 0;
-var playerY = 0;
-var mapArray = [];
-var yMax;
-var xMax;
+}
 
-// Justin's Settings
-  // Map Size
-  var xAxis = 50;
-  var yAxis = 50;
-  var complexity = 30;
-  // Hallway Size
-  var hallLengthMin = 10;
-  var hallLengthMax = 21;
-  // Line of Sight
-  var sightLength = 10
-  var sightBound = 2 * sightLength + 1;
+Level.prototype.createLevel = function() {
+    for(var y = 0; y < this.yAxis; ++y){
+      this.mapArray[y] = [];
+      for(var x = 0; x < this.xAxis; ++x){
+        this.mapArray[y][x] = 'X';
+      }
+    }
+
+    // Inserts a start point in the center of the map
+    this.yOrigin = Math.floor(this.yAxis/2);
+    this.xOrigin = Math.floor(this.xAxis/2);
+    this.mapArray[this.yOrigin][this.xOrigin] = '.';
+
+    // Place player at center of the map
+    this.playerY = this.yOrigin;
+    this.playerX = this.xOrigin;
+
+    // Creates walls around random start point
+    for(var i = 0; i < this.complexity; ++i){
+      // Create array of floor locations.
+      this.floorList = this.createIndex('.');
+
+      // Replaces dirt(X) surrounding floors(.) with walls (#)
+      this.insertWalls();
+
+      // Create array of wall locations
+      this.wallList = this.createIndex('#');
+
+      // Takes a random wall location from the wall list
+      var newOrigin = this.wallList[(Math.floor(Math.random() * (this.wallList.length - 1)) + 1)];
+
+      // Takes in the random wall location and inserts a tunnel of variable length
+      this.insertTunnel(newOrigin);
+    }
+
+    // Updates array of floor locations
+    this.floorList = this.createIndex('.');
+
+    // Updates map with walls
+    this.insertWalls();
+
+    // Inserts player icon.
+    this.mapArray[this.playerY][this.playerX] = "@";
+
+    // Removes all Xs from the map array and replaces them with "&nbsp;"
+    this.removeDirt();
+
+    // Draws map
+    this.checkSight();
+    this.drawMap();
+  };
+
 
 var Vault = function(yAxisLength, xAxisLength) {
   this.playerX = 4;
@@ -138,19 +188,15 @@ Vault.prototype.drawVault = function() {
   for(var y = 0; y < this.yAxisLength; ++y){
     for(var i = 1; i < 6 ; ++i){
       for(var x = 0; x < this.xAxisLength; ++x){
-        // if(this.floor[y][x].seenRoom){
-          if(i === 1){
-            $("#main_con").append("<span>**" + "<span id=door_span>" + this.floor[y][x].doorN + "</span>" + "**</span>");
-          }else if(i === 3){
-            $("#main_con").append( "<span><span id=door_span>" + this.floor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + this.floor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + this.floor[y][x].doorE + "</span></span>");
-          }else if (i === 5){
-            $("#main_con").append("<span>**" +  "<span id=door_span>" + this.floor[y][x].doorS + "</span>" + "**</span>");
-          }else{
-            $("#main_con").append("<span>*&nbsp;&nbsp;&nbsp;*</span>");
-          }
-        // }else{
-        //   $("#main_con").append("<span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>");
-        // }
+        if(i === 1){
+          $("#main_con").append("<span>**" + "<span id=door_span>" + this.floor[y][x].doorN + "</span>" + "**</span>");
+        }else if(i === 3){
+          $("#main_con").append( "<span><span id=door_span>" + this.floor[y][x].doorW + "</span>" + "&nbsp" + "<span id=player_span>" +  "<span id=player_span>" + this.floor[y][x].playerLocation + "</span>" + "&nbsp;" + "<span id=door_span>" + this.floor[y][x].doorE + "</span></span>");
+        }else if (i === 5){
+          $("#main_con").append("<span>**" +  "<span id=door_span>" + this.floor[y][x].doorS + "</span>" + "**</span>");
+        }else{
+          $("#main_con").append("<span>*&nbsp;&nbsp;&nbsp;*</span>");
+        }
       }
       $("#main_con").append("<br>");
     }
@@ -383,105 +429,25 @@ function doKeyDown(event){
 };
 
 function playerMovement(checkY, checkX){
-  if(mapArray[playerY + checkY][playerX + checkX] === "."){
-    mapArray[playerY][playerX] = '.';
-    playerY += checkY;
-    playerX += checkX;
-    mapArray[playerY][playerX] = "@";
-    checkSight();
-    drawMap();
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX] === "."){
+    levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = '.';
+    levelArray[0].playerY += checkY;
+    levelArray[0].playerX += checkX;
+    levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = "@";
+    levelArray[0].checkSight();
+    levelArray[0].drawMap();
   } else{
     console.log("invalid");
   }
 };
 
-// ----------------------------------
-
-var visibleArray = [];
-var perimeterArray = [];
-
-// Justin's Global Variables
-var firstFloor = [];
-var firstfirstFloorList = [];
-var firstWallList = [];
-var playerX = 0;
-var playerY = 0;
-var mapArray = [];
-var yMax;
-var xMax;
-
-// Justin's Settings
-  // Map Size
-  var xAxis = 50;
-  var yAxis = 50;
-  var complexity = 30;
-  // Hallway Size
-  var hallLengthMin = 10;
-  var hallLengthMax = 21;
-  // Line of Sight
-  var sightLength = 10
-  var sightBound = 2 * sightLength + 1;
-
-// Master floor creation function
-function createFloor(){
-  for(var y = 0; y < yAxis; ++y){
-    mapArray[y] = [];
-    for(var x = 0; x < xAxis; ++x){
-      mapArray[y][x] = 'X';
-    }
-  }
-
-  // Inserts a start point in the center of the map
-  var yOrigin = Math.floor(yAxis/2);
-  var xOrigin = Math.floor(xAxis/2);
-  mapArray[yOrigin][xOrigin] = '.';
-
-  // Place player at center of the map
-  playerY = yOrigin;
-  playerX = xOrigin;
-
-  // Creates walls around random start point
-  for(var i = 0; i < complexity; ++i){
-    // Create array of floor locations.
-    firstFloorList = createIndex('.');
-
-    // Replaces dirt(X) surrounding floors(.) with walls (#)
-    insertWalls();
-
-    // Create array of wall locations
-    firstWallList = createIndex('#');
-
-    // Takes a random wall location from the wall list
-    var newOrigin = firstWallList[(Math.floor(Math.random() * (firstWallList.length - 1)) + 1)];
-
-    // Takes in the random wall location and inserts a tunnel of variable length
-    insertTunnel(newOrigin);
-  }
-
-  // Updates array of floor locations
-  firstFloorList = createIndex('.');
-
-  // Updates map with walls
-  insertWalls();
-
-  // Inserts player icon.
-  mapArray[playerY][playerX] = "@";
-
-  // Removes all Xs from the map array and replaces them with "&nbsp;"
-  removeDirt();
-
-  // Draws map
-  checkSight();
-  drawMap();
-};
-
 // Takes in a character, finds all instances of the character in the map and creates a new array with their locations
-function createIndex(char) {
+Level.prototype.createIndex = function(char) {
   var index = [];
 
-  for(var y = 0; y < yAxis; ++y){
-    for(var x = 0; x < xAxis; ++x){
-      if(mapArray[y][x] === char) {
+  for(var y = 0; y < this.yAxis; ++y){
+    for(var x = 0; x < this.xAxis; ++x){
+      if(this.mapArray[y][x] === char) {
         index.push([y,x]);
       }
     }
@@ -490,47 +456,47 @@ function createIndex(char) {
 };
 
 // Replaces dirt(X) surrounding floors(.) with walls (#)
-function insertWalls(){
+Level.prototype.insertWalls = function() {
   // Find the number of floors in game.
-  var length = firstFloorList.length;
+  var length = this.floorList.length;
 
   // Checks every floor location and the surrounding 8 tiles, replacing X with #.
   for(var i = 0; i < length; ++i) {
-    var currentY = firstFloorList[i][0];
-    var currentX = firstFloorList[i][1];
+    var currentY = this.floorList[i][0];
+    var currentX = this.floorList[i][1];
 
     for(var y = -1; y <= 1; ++y) {
       for(var x = -1; x <= 1; ++x) {
-        if(currentY + y >= 0 && currentY + y < yAxis && currentX + x >= 0 && currentX + x < xAxis)
-        if(mapArray[currentY + y][currentX + x] === "X"){
-          mapArray[currentY + y][currentX + x] = "#";
+        if(currentY + y >= 0 && currentY + y < this.yAxis && currentX + x >= 0 && currentX + x < this.xAxis)
+        if(this.mapArray[currentY + y][currentX + x] === "X"){
+          this.mapArray[currentY + y][currentX + x] = "#";
         }
       }
     }
   }
 
   // Redraws the perimeter
-  drawPerimeter();
+  this.drawPerimeter();
 };
 
 // Draws bedrock perimeter around map
-function drawPerimeter(){
-  for(var x = 0; x < xAxis; ++x){
-    mapArray[0][x] = "B";
-    mapArray[yAxis-1][x] = "B";
+Level.prototype.drawPerimeter = function() {
+  for(var x = 0; x < this.xAxis; ++x){
+    this.mapArray[0][x] = "B";
+    this.mapArray[this.yAxis-1][x] = "B";
   }
 
-  for(var y = 0; y < yAxis; ++y){
-    mapArray[y][0] = "B";
-    mapArray[y][xAxis-1] = "B";
+  for(var y = 0; y < this.yAxis; ++y){
+    this.mapArray[y][0] = "B";
+    this.mapArray[y][this.xAxis-1] = "B";
   }
 };
 
 // Takes in a wall location(origin) composed of an array [[y,x]] and inserts a line of floor (.) of variable length in a variable direction
-function insertTunnel(origin) {
+Level.prototype.insertTunnel = function(origin) {
 
-  var yOrigin = origin[0];
-  var xOrigin = origin[1];
+  this.yOrigin = origin[0];
+  this.xOrigin = origin[1];
   var directionArray = ["n","s","e","w"];
   var increment = 0;
 
@@ -539,26 +505,26 @@ function insertTunnel(origin) {
     // Choose a random direction for tunnel
     var direction = (Math.floor(Math.random() * (4 - 0)) + 0);
     // Choose a random length of tunnel
-    var length =  (Math.floor(Math.random() * (hallLengthMax - hallLengthMin)) + hallLengthMin);
+    var length =  (Math.floor(Math.random() * (this.hallLengthMax - this.hallLengthMin)) + this.hallLengthMin);
 
-      if(directionArray[direction] === "n" && yOrigin-length >=0) {
+      if(directionArray[direction] === "n" && this.yOrigin-length >=0) {
         for(var i = 1; i < length + 1; ++i){
-          mapArray[yOrigin - i][xOrigin] = ".";
+          this.mapArray[this.yOrigin - i][this.xOrigin] = ".";
         }
         increment = 5;
-      } else if(directionArray[direction] === "s" && yOrigin + length < yAxis) {
+      } else if(directionArray[direction] === "s" && this.yOrigin + length < this.yAxis) {
         for(var i = 1; i < length + 1; ++i){
-          mapArray[yOrigin + i][xOrigin] = ".";
+          this.mapArray[this.yOrigin + i][this.xOrigin] = ".";
         }
         increment = 5;
-      } else if(directionArray[direction] === "e" && xOrigin + length < xAxis) {
+      } else if(directionArray[direction] === "e" && this.xOrigin + length < this.xAxis) {
         for(var i = 1; i < length + 1; ++i){
-          mapArray[yOrigin][xOrigin + i] = ".";
+          this.mapArray[this.yOrigin][this.xOrigin + i] = ".";
         }
         increment = 5;
-      } else if(xOrigin - length >= 0){
+      } else if(this.xOrigin - length >= 0){
         for(var i = 1; i < length + 1; ++i){
-          mapArray[yOrigin][xOrigin - i] = ".";
+          this.mapArray[this.yOrigin][this.xOrigin - i] = ".";
         }
         increment = 5;
       } else {
@@ -567,19 +533,214 @@ function insertTunnel(origin) {
     } while(increment < 5);
 
     // Replace origin wall with dirt.
-    mapArray[yOrigin][xOrigin] = ".";
+    this.mapArray[this.yOrigin][this.xOrigin] = ".";
 };
 
 // Removes dirt and replaces it with nbsp
-function removeDirt(){
-  for(var y = 0; y < yAxis; ++y){
-    for(var x = 0; x < xAxis; ++x) {
-      if(mapArray[y][x] === "X"){
-        mapArray[y][x] = "&nbsp;";
+Level.prototype.removeDirt = function() {
+  for(var y = 0; y < this.yAxis; ++y){
+    for(var x = 0; x < this.xAxis; ++x) {
+      if(this.mapArray[y][x] === "X"){
+        this.mapArray[y][x] = "&nbsp;";
       }
     }
   }
 };
+
+
+//Begin LoS Functions
+
+// Draws only the visible area of the map
+
+Level.prototype.drawMap = function() {
+  $("#main_con").text("");
+
+  // Loops through the visible map area
+
+  for(var y = 0; y <= this.sightBound; ++y){
+    for(var x = 0; x <= this.sightBound; ++x){
+
+      //Draws visibleArray with appropriate color markups.
+
+      if(this.visibleArray[y][x] === "@"){
+          $("#main_con").append("<span id='player'>@<span>");
+      }else if(this.visibleArray[y][x] === "#"){
+        $("#main_con").append("<span class='block'>#<span>");
+      }else if(this.visibleArray[y][x] === "B"){
+        $("#main_con").append("<span class='block'>#<span>");
+      }else{
+        $("#main_con").append("<span class='visible'>" + this.visibleArray[y][x] + "</span>");
+      }
+    }
+  $("#main_con").append("<br>");
+  }
+
+}
+
+// Determines the coordinates for drawing a line from x0, y0 to x1,y1. Terminates if plot() returns a false.
+
+Level.prototype.drawline = function(x0,y0,x1,y1){
+	var tmp;
+	var steep = Math.abs(y1-y0) > Math.abs(x1-x0);
+  if(steep){
+  	//swap x0,y0
+  	tmp=x0; x0=y0; y0=tmp;
+    //swap x1,y1
+    tmp=x1; x1=y1; y1=tmp;
+  }
+
+  var sign = 1;
+	if(x0>x1){
+    sign = -1;
+    x0 *= -1;
+    x1 *= -1;
+  }
+  var dx = x1-x0;
+  var dy = Math.abs(y1-y0);
+  var err = ((dx/2));
+  var ystep = y0 < y1 ? 1:-1;
+  var y = y0;
+
+  // Goes down the line's coordinates, starting from the origin. If plot returns a false, drawline() terminates
+
+  for(var x=x0;x<=x1;x++){
+  	if(!(steep ? this.plot(y,sign*x) : this.plot(sign*x,y))) return;
+    err = (err - dy);
+    if(err < 0){
+    	y+=ystep;
+      err+=dx;
+    }
+
+  }
+}
+
+//Used by drawline to plot the current coordinates. Checks to see if current coordinates are a wall, and if so, sends back a false and terminates drawline(). Automatically populates visibleArray with the matching data in mapArray for the current coordinates regardless of outcome.
+
+Level.prototype.plot = function(x,y){
+
+  // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
+
+  this.visibleArray[this.sightLength+y][this.sightLength+x] = this.mapArray[this.playerY+y][this.playerX+x];
+  if(this.mapArray[this.playerY+y][this.playerX+x] !== "#"){
+    return true;
+  }
+  else{
+    return false;
+  }
+}
+
+// Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
+
+Level.prototype.checkSight = function() {
+
+  //These variables are what will prevent plot() from checking undefined array locations.
+
+  var boundNorth;
+  var boundSouth;
+  var boundEast;
+  var boundWest;
+
+// The following for loops are checking for terminal objects (i.e. level boundaries) in each of the cardinal directions and, upon finding them, setting the boundVar to their relative distance from the player. Otherwise, the boundVar will equal the sightLength
+
+  for(var i = 0; i >= this.sightLength * -1; --i){
+    boundNorth = i;
+    if(this.mapArray[this.playerY + i][this.playerX].match(/B/) !== null){
+      break;
+    }
+  }
+
+  for(var i = 0; i <= this.sightLength; ++i){
+    boundSouth = i;
+    if(this.mapArray[this.playerY + i][this.playerX].match(/B/) !== null){
+      break;
+    }
+  }
+
+  for(var i = 0; i <= this.sightLength; ++i){
+    boundEast = i;
+    if(this.mapArray[this.playerY][this.playerX + i].match(/B/) !== null){
+      break;
+    }
+  }
+
+  for(var i = 0; i >= this.sightLength * -1; --i){
+    boundWest = i;
+    if(this.mapArray[this.playerY][this.playerX + i].match(/B/) !== null){
+      break;
+    }
+  }
+
+// The following for loops build an array of perimeter coordinates using the boundaries established by the boundVars. This ensures that plot() will never attempt to look outside of mapArray's defined data.  Each loop handles 2 of the 8 octants.
+
+  //    Octants:
+  //     \1|2/
+  //     8\|/3
+  //     --+--
+  //     7/|\4
+  //     /8|5\
+
+  this.perimeterArray = [];
+
+  // Builds octant 1 and 6 perimeter values
+  for(var i = 0; i >= boundWest; --i){
+    this.perimeterArray.push([boundNorth,i]);
+    this.perimeterArray.push([boundSouth,i]);
+  }
+
+  // Builds octant 8 and 3 perimter values
+  for(var i = 0; i >= boundNorth; --i){
+    this.perimeterArray.push([i,boundWest]);
+    this.perimeterArray.push([i,boundEast]);
+  }
+
+  // Builds octant 2 and 5 perimter values
+  for(var i = 0; i <= boundEast; ++i){
+    this.perimeterArray.push([boundNorth, i]);
+    this.perimeterArray.push([boundSouth, i]);
+  }
+
+  // Builds octant 4 and 7 perimter values
+  for(var i = 0; i <= boundSouth; ++i){
+    this.perimeterArray.push([i, boundWest]);
+    this.perimeterArray.push([i, boundEast]);
+  }
+
+  // Resets and builds visibleArray at a constant size, and populates it with blank (i.e. invisible) spaces
+
+  this.visibleArray = [];
+
+  for(var i = 0; i <= this.sightBound; ++i) {
+    this.visibleArray[i] = [];
+    for(var j = 0; j <= this.sightBound; ++j){
+      this.visibleArray[i][j] = "&nbsp;";
+    }
+  }
+
+  // Checks visible area within allowed boundaries.
+
+  for(var i = 0; i < this.perimeterArray.length ; ++i){
+    var toY = this.perimeterArray[i][0];
+    var toX = this.perimeterArray[i][1];
+
+    // (origin y, origin x, draw to y, draw to x) ??
+    this.drawline(0,0,toX,toY);
+  }
+
+}
+
+// ----------------------------------
+
+// Always active keyboard input
+window.addEventListener("keypress", doKeyDown, false);
+
+// Calls map creation
+window.onload = function () {
+  levelArray[0] = new Level(100, 100, 40, 10, 21, 10);
+  levelArray[0].createLevel();
+};
+
+
+// Legacy code
 
 // Legacy code that draws entire floor, being left in for testing purposes.
 
@@ -623,192 +784,26 @@ function removeDirt(){
 //   drawMap();
 // };
 
-//Begin LoS Functions
+//
+// var visibleArray = [];
+// var perimeterArray = [];
 
-// Draws only the visible area of the map
+// Justin's Global Variables
 
-function drawMap() {
-  $("#main_con").text("");
+// var firstfirstFloorList = [];
+// var firstWallList = [];
+// var playerX = 0;
+// var playerY = 0;
+// var mapArray = [];
 
-  // Loops through the visible map area
-
-  for(var y = 0; y <= sightBound; ++y){
-    for(var x = 0; x <= sightBound; ++x){
-
-      //Draws visibleArray with appropriate color markups.
-
-      if(visibleArray[y][x] === "@"){
-          $("#main_con").append("<span id='player'>@<span>");
-      }else if(visibleArray[y][x] === "#"){
-        $("#main_con").append("<span class='block'>#<span>");
-      }else if(visibleArray[y][x] === "B"){
-        $("#main_con").append("<span class='block'>#<span>");
-      }else{
-        $("#main_con").append("<span class='visible'>" + visibleArray[y][x] + "</span>");
-      }
-    }
-  $("#main_con").append("<br>");
-  }
-
-}
-
-// Determines the coordinates for drawing a line from x0, y0 to x1,y1. Terminates if plot() returns a false.
-
-var drawline = function(x0,y0,x1,y1){
-	var tmp;
-	var steep = Math.abs(y1-y0) > Math.abs(x1-x0);
-  if(steep){
-  	//swap x0,y0
-  	tmp=x0; x0=y0; y0=tmp;
-    //swap x1,y1
-    tmp=x1; x1=y1; y1=tmp;
-  }
-
-  var sign = 1;
-	if(x0>x1){
-    sign = -1;
-    x0 *= -1;
-    x1 *= -1;
-  }
-  var dx = x1-x0;
-  var dy = Math.abs(y1-y0);
-  var err = ((dx/2));
-  var ystep = y0 < y1 ? 1:-1;
-  var y = y0;
-
-  // Goes down the line's coordinates, starting from the origin. If plot returns a false, drawline() terminates
-
-  for(var x=x0;x<=x1;x++){
-  	if(!(steep ? plot(y,sign*x) : plot(sign*x,y))) return;
-    err = (err - dy);
-    if(err < 0){
-    	y+=ystep;
-      err+=dx;
-    }
-
-  }
-}
-
-//Used by drawline to plot the current coordinates. Checks to see if current coordinates are a wall, and if so, sends back a false and terminates drawline(). Automatically populates visibleArray with the matching data in mapArray for the current coordinates regardless of outcome.
-
-var plot = function(x,y){
-
-  // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
-
-  visibleArray[sightLength+y][sightLength+x] = mapArray[playerY+y][playerX+x];
-  if(mapArray[playerY+y][playerX+x] !== "#"){
-    return true;
-  }
-  else{
-    return false;
-  }
-}
-
-// Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
-
-function checkSight() {
-
-  //These variables are what will prevent plot() from checking undefined array locations.
-
-  var boundNorth;
-  var boundSouth;
-  var boundEast;
-  var boundWest;
-
-// The following for loops are checking for terminal objects (i.e. level boundaries) in each of the cardinal directions and, upon finding them, setting the boundVar to their relative distance from the player. Otherwise, the boundVar will equal the sightLength
-
-  for(var i = 0; i >= sightLength * -1; --i){
-    boundNorth = i;
-    if(mapArray[playerY + i][playerX].match(/B/) !== null){
-      break;
-    }
-  }
-
-  for(var i = 0; i <= sightLength; ++i){
-    boundSouth = i;
-    if(mapArray[playerY + i][playerX].match(/B/) !== null){
-      break;
-    }
-  }
-
-  for(var i = 0; i <= sightLength; ++i){
-    boundEast = i;
-    if(mapArray[playerY][playerX + i].match(/B/) !== null){
-      break;
-    }
-  }
-
-  for(var i = 0; i >= sightLength * -1; --i){
-    boundWest = i;
-    if(mapArray[playerY][playerX + i].match(/B/) !== null){
-      break;
-    }
-  }
-
-// The following for loops build an array of perimeter coordinates using the boundaries established by the boundVars. This ensures that plot() will never attempt to look outside of mapArray's defined data.  Each loop handles 2 of the 8 octants.
-
-  //    Octants:
-  //     \1|2/
-  //     8\|/3
-  //     --+--
-  //     7/|\4
-  //     /8|5\
-
-  perimeterArray = [];
-
-  // Builds octant 1 and 6 perimeter values
-  for(var i = 0; i >= boundWest; --i){
-    perimeterArray.push([boundNorth,i]);
-    perimeterArray.push([boundSouth,i]);
-  }
-
-  // Builds octant 8 and 3 perimter values
-  for(var i = 0; i >= boundNorth; --i){
-    perimeterArray.push([i,boundWest]);
-    perimeterArray.push([i,boundEast]);
-  }
-
-  // Builds octant 2 and 5 perimter values
-  for(var i = 0; i <= boundEast; ++i){
-    perimeterArray.push([boundNorth, i]);
-    perimeterArray.push([boundSouth, i]);
-  }
-
-  // Builds octant 4 and 7 perimter values
-  for(var i = 0; i <= boundSouth; ++i){
-    perimeterArray.push([i, boundWest]);
-    perimeterArray.push([i, boundEast]);
-  }
-
-  // Resets and builds visibleArray at a constant size, and populates it with blank (i.e. invisible) spaces
-
-  visibleArray = [];
-
-  for(var i = 0; i <= sightBound; ++i) {
-    visibleArray[i] = [];
-    for(var j = 0; j <= sightBound; ++j){
-      visibleArray[i][j] = "&nbsp;";
-    }
-  }
-
-  // Checks visible area within allowed boundaries.
-
-  for(var i = 0; i < perimeterArray.length ; ++i){
-    var toY = perimeterArray[i][0];
-    var toX = perimeterArray[i][1];
-
-    // (origin y, origin x, draw to y, draw to x) ??
-    drawline(0,0,toX,toY);
-  }
-
-}
-
-// ----------------------------------
-
-// Always active keyboard input
-window.addEventListener("keypress", doKeyDown, false);
-
-// Calls map creation
-window.onload = function () {
-  createFloor();
-};
+// Justin's Settings
+  // Map Size
+  // var xAxis = 50;
+  // var yAxis = 50;
+  // var complexity = 30;
+  // Hallway Size
+  // var hallLengthMin = 10;
+  // var hallLengthMax = 21;
+  // Line of Sight
+  // var sightLength = 10
+  // var sightBound = 2 * sightLength + 1;
