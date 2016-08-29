@@ -199,13 +199,10 @@ Vault.prototype.updateSanity = function(){
   if(this.floor[this.playerY][this.playerX].lightLevel === "bright" || flashlightState === "high"){
   }else if(this.floor[this.playerY][this.playerX].lightLevel === "dim" || flashlightState === "on"){
     sanity -= 1;
-    console.log("Sanity - 1")
   }else if(this.floor[this.playerY][this.playerX].lightLevel === "flickering"){
     sanity -= 2;
-    console.log("Sanity - 2")
   }else{
     sanity -= 3;
-    console.log("Sanity - 3")
   }
 
   if(sanity < 0){
@@ -350,7 +347,6 @@ Level.prototype.createShadows = function(){
     this.yOrigin = newOrigin[0];
     this.xOrigin = newOrigin[1];
     this.shadowsArray.push(new Shadow(this.yOrigin, this.xOrigin, 2));
-    this.mapArray[this.yOrigin][this.xOrigin] = "S";
   }
 };
 
@@ -473,7 +469,6 @@ function doKeyDown(event){
       playerMovement(1, 1);
     }
   }
-  console.log(levelArray[0].currentDirection);
 
 };
 
@@ -496,48 +491,31 @@ function playerMovement(checkY, checkX){
     levelArray[0].playerY += checkY;
     levelArray[0].playerX += checkX;
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = "@";
-    // levelArray[0].shadowMovement();
+    for (var i = 0; i < levelArray[0].shadowsArray.length; ++i) {
+      levelArray[0].shadowsArray[i].shadowMovement();
+    }
     levelArray[0].checkSight();
     levelArray[0].drawMap();
-  } else{
-    console.log("invalid");
   }
 
 };
-//
-// Level.prototype.shadowMovement = function(){
-//   this.shadows.forEach(function(shadow){
-//     if(Math.pow(levelArray[0].playerY-shadow[0],2) + Math.pow(levelArray[0].playerX-shadow[1],2) <= Math.pow(levelArray[0].sightLength,2)) {
-//
-//       if(shadow[0] > levelArray[0].playerY){
-//         if(levelArray[0].mapArray[shadow[0] - 1][shadow[1]] != "#"){
-//           shadow[0] -= 1;
-//           levelArray[0].mapArray[shadow[0]+1][shadow[1]] = ".";
-//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-//         }
-//       } else {
-//         if(levelArray[0].mapArray[shadow[0] + 1][shadow[1]] != "#"){
-//           shadow[0] += 1;
-//           levelArray[0].mapArray[shadow[0]-1][shadow[1]] = ".";
-//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-//         }
-//       }
-//       if(shadow[1]>levelArray[0].playerX){
-//         if(levelArray[0].mapArray[shadow[0]][shadow[1] - 1] != "#"){
-//           shadow[1] -= 1;
-//           levelArray[0].mapArray[shadow[0]][shadow[1]+1] = ".";
-//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-//         }
-//       } else {
-//         if(levelArray[0].mapArray[shadow[0]][shadow[1] + 1] != "#"){
-//           shadow[1] += 1;
-//           levelArray[0].mapArray[shadow[0]][shadow[1]-1] = ".";
-//           levelArray[0].mapArray[shadow[0]][shadow[1]] += "S";
-//         }
-//       }
-//     }
-//   });
-// };
+
+Shadow.prototype.shadowMovement = function(){
+  console.log(this.shadowY, this.shadowX);
+  // console.log(levelArray[0].playerY, levelArray[0].playerX);
+  if(Math.pow(levelArray[0].playerY-this.shadowY,2) + Math.pow(levelArray[0].playerX-this.shadowX,2) <= Math.pow(levelArray[0].sightLength,2)) {
+    if(this.shadowY > levelArray[0].playerY){
+      this.shadowY -= 1;
+    } else {
+      this.shadowY += 1;
+    }
+    if(this.shadowX > levelArray[0].playerX){
+      this.shadowX -= 1;
+    } else {
+      this.shadowX += 1;
+    }
+  }
+};
 //
 // Level.prototype.shadowEncounter = function(){
 //   sanity -= 10;
@@ -873,14 +851,13 @@ Level.prototype.checkFlashlight = function(boundNorth, boundSouth, boundEast, bo
     }
   }
 
-  console.log(tempArray)
   return tempArray;
 
 
 }
 
-function between(x, min, max) {
-  return x >= min && x <= max;
+function between(num, min, max) {
+  return num >= min && num <= max;
 }
 
 Level.prototype.checkSight = function() {
@@ -990,8 +967,6 @@ Level.prototype.checkSight = function() {
     // (origin y, origin x, draw to y, draw to x) ??
     this.drawline(0,0,toX,toY);
   }
-  var signy = 0;
-  var signx = 0;
 
   for(var i = 0; i < this.shadowsArray.length; ++i){
 
@@ -999,19 +974,7 @@ Level.prototype.checkSight = function() {
     var shadowX = this.shadowsArray[i].shadowX;
 
     if(between(shadowY, this.playerY - this.sightLength, this.playerY + this.sightLength) && between(shadowX, this.playerX - this.sightLength, this.playerX + this.sightLength)) {
-      if(shadowY >= this.playerY){
-        signy = 1;
-      } else {
-        signy = -1;
-      }
-      if(shadowX >= this.playerX){
-        signx = 1;
-      } else {
-        signx = -1;
-      }
       this.visibleArray[this.sightLength + ((shadowY - this.playerY))][this.sightLength + ((shadowX - this.playerX))] = "S";
-      console.log("shadow found")
-
     }
   }
 }
