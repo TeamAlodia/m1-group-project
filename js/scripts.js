@@ -9,81 +9,6 @@ var vaultArray = [];
 var currentVault = -1;
 var inVault = false;
 var levelArray = [];
-
-var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength) {
-  this.playerX;
-  this.playerY;
-  this.vaultArray = [];
-  this.xOrigin;
-  this.yOrigin;
-  this.wallList = [];
-  this.floorList = [];
-  this.mapArray = [];
-  this.xAxis = xAxis;
-  this.yAxis = yAxis;
-  this.complexity = complexity;
-  this.hallLengthMin = hallLengthMin;
-  this.hallLengthMax = hallLengthMax;
-  this.sightLength = sightLength;
-  this.sightBound = 2 * sightLength + 1;
-  this.visibleArray = [];
-  this.perimeterArray = [];
-
-}
-
-Level.prototype.createLevel = function() {
-    for(var y = 0; y < this.yAxis; ++y){
-      this.mapArray[y] = [];
-      for(var x = 0; x < this.xAxis; ++x){
-        this.mapArray[y][x] = 'X';
-      }
-    }
-
-    // Inserts a start point in the center of the map
-    this.yOrigin = Math.floor(this.yAxis/2);
-    this.xOrigin = Math.floor(this.xAxis/2);
-    this.mapArray[this.yOrigin][this.xOrigin] = '.';
-
-    // Place player at center of the map
-    this.playerY = this.yOrigin;
-    this.playerX = this.xOrigin;
-
-    // Creates walls around random start point
-    for(var i = 0; i < this.complexity; ++i){
-      // Create array of floor locations.
-      this.floorList = this.createIndex('.');
-
-      // Replaces dirt(X) surrounding floors(.) with walls (#)
-      this.insertWalls();
-
-      // Create array of wall locations
-      this.wallList = this.createIndex('#');
-
-      // Takes a random wall location from the wall list
-      var newOrigin = this.wallList[(Math.floor(Math.random() * (this.wallList.length - 1)) + 1)];
-
-      // Takes in the random wall location and inserts a tunnel of variable length
-      this.insertTunnel(newOrigin);
-    }
-
-    // Updates array of floor locations
-    this.floorList = this.createIndex('.');
-
-    // Updates map with walls
-    this.insertWalls();
-
-    // Inserts player icon.
-    this.mapArray[this.playerY][this.playerX] = "@";
-
-    // Removes all Xs from the map array and replaces them with "&nbsp;"
-    this.removeDirt();
-
-    // Draws map
-    this.checkSight();
-    this.drawMap();
-  };
-
-
 var Vault = function(yAxisLength, xAxisLength) {
   this.playerX = 4;
   this.playerY = 4;
@@ -382,6 +307,80 @@ function updateFlashlight() {
     flashlightState = "off";
   }
 }
+
+var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength) {
+  this.playerX;
+  this.playerY;
+  this.vaultArray = [];
+  this.xOrigin;
+  this.yOrigin;
+  this.wallList = [];
+  this.floorList = [];
+  this.mapArray = [];
+  this.xAxis = xAxis;
+  this.yAxis = yAxis;
+  this.complexity = complexity;
+  this.hallLengthMin = hallLengthMin;
+  this.hallLengthMax = hallLengthMax;
+  this.sightLength = sightLength;
+  this.sightBound = 2 * sightLength + 1;
+  this.visibleArray = [];
+  this.perimeterArray = [];
+}
+
+Level.prototype.createLevel = function() {
+    for(var y = 0; y < this.yAxis; ++y){
+      this.mapArray[y] = [];
+      for(var x = 0; x < this.xAxis; ++x){
+        this.mapArray[y][x] = 'X';
+      }
+    }
+
+    // Inserts a start point in the center of the map
+    this.yOrigin = Math.floor(this.yAxis/2);
+    this.xOrigin = Math.floor(this.xAxis/2);
+    this.mapArray[this.yOrigin][this.xOrigin] = '.';
+
+    // Place player at center of the map
+    this.playerY = this.yOrigin;
+    this.playerX = this.xOrigin;
+
+    // Creates walls around random start point
+    for(var i = 0; i < this.complexity; ++i){
+      // Create array of floor locations.
+      this.floorList = this.createIndex('.');
+
+      // Replaces dirt(X) surrounding floors(.) with walls (#)
+      this.insertWalls();
+
+      // Create array of wall locations
+      this.wallList = this.createIndex('#');
+
+      // Takes a random wall location from the wall list
+      var newOrigin = this.wallList[(Math.floor(Math.random() * (this.wallList.length - 1)) + 1)];
+
+      // Takes in the random wall location and inserts a tunnel of variable length
+      this.insertTunnel(newOrigin);
+    }
+
+    // Updates array of floor locations
+    this.floorList = this.createIndex('.');
+
+    // Updates map with walls
+    this.insertWalls();
+
+    // Inserts player icon.
+    this.mapArray[this.playerY][this.playerX] = "@";
+
+    // Removes all Xs from the map array and replaces them with "&nbsp;"
+    this.removeDirt();
+
+    // Draws map
+    this.checkSight();
+    this.drawMap();
+  };
+
+
 
 // Links keyboard input with actions: currently just movement
 function doKeyDown(event){
