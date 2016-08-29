@@ -5,7 +5,11 @@ body{
   line-height: 10px;
 }
 
-.visible{
+.superlit{
+  color: #ffffcc;
+}
+
+.lit{
   color: #00e600;
 }
 
@@ -25,7 +29,7 @@ body{
   color: green;
 }
 
-.lit{
+.unlit{
   color: black;
   text-shadow: 0 0 5px #ffffe6;
 }

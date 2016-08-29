@@ -2,13 +2,14 @@ var keys = 99;
 var batteries = 0;
 var flashlightPower = 100;
 var flashlightMeter = "";
-var flashlightState = "on";
+var flashlightState = "superlit";
 var sanity = 100;
 var sanityMeter="";
 var vaultArray = [];
 var currentVault = -1;
 var inVault = false;
 var levelArray = [];
+
 var Vault = function(yAxisLength, xAxisLength) {
   this.playerX = 4;
   this.playerY = 4;
@@ -350,7 +351,6 @@ Level.prototype.createShadows = function(){
     this.yOrigin = newOrigin[0];
     this.xOrigin = newOrigin[1];
     this.shadowsArray.push(new Shadow(this.yOrigin, this.xOrigin, 2));
-    this.mapArray[this.yOrigin][this.xOrigin] = "S";
   }
 };
 
@@ -426,12 +426,16 @@ Level.prototype.createLevel = function() {
 // Links keyboard input with actions: currently just movement
 function doKeyDown(event){
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
-    flashlightState = "on";
+    flashlightState = "lit";
+    console.log("lit")
   }else if(event.keyCode === 115 && flashlightState === "on" && flashlightPower > 0){
-    flashlightState = "high";
+    flashlightState = "superlit";
+    console.log("superlit")
   }else if(event.keyCode === 115){
     flashlightState = "off";
+    console.log("off")
   }
+
   if(inVault){
     if (event.keyCode === 119){
       vaultArray[currentVault].movePlayer("n");
@@ -456,7 +460,7 @@ function doKeyDown(event){
     } else if (event.keyCode === 100){
       levelArray[0].currentDirection = "e";
       playerMovement(0, 1);
-    } else if (event.keyCode === 115){
+    } else if (event.keyCode === 120){
       levelArray[0].currentDirection = "s";
       playerMovement(1, 0);
     }else if (event.keyCode === 113){
@@ -743,9 +747,9 @@ Level.prototype.drawMap = function() {
       }else if(this.visibleArray[y][x].match(/#/) !== null){
         $("#main_con").append("<span class='block'>#<span>");
       }else if(this.visibleArray[y][x] === "B"){
-        $("#main_con").append("<span class='visible block'>#<span>");
+        $("#main_con").append("<span class='lit block'>#<span>");
       }else{
-        $("#main_con").append("<span class='lit'>" + this.visibleArray[y][x] + "</span>");
+        $("#main_con").append("<span class='unlit'>" + this.visibleArray[y][x] + "</span>");
       }
     }
   $("#main_con").append("<br>");
@@ -798,7 +802,7 @@ Level.prototype.plot = function(x,y){
   // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
 
   if(this.checkLight){
-    this.visibleArray[this.sightLength+y][this.sightLength+x] = "<span class='visible'>" +  this.mapArray[this.playerY+y][this.playerX+x] + "<span>";
+    this.visibleArray[this.sightLength+y][this.sightLength+x] = "<span class='" + flashlightState + "'>" +  this.mapArray[this.playerY+y][this.playerX+x] + "<span>";
   }else{
     this.visibleArray[this.sightLength+y][this.sightLength+x] = this.mapArray[this.playerY+y][this.playerX+x];
   }
@@ -879,8 +883,8 @@ Level.prototype.checkFlashlight = function(boundNorth, boundSouth, boundEast, bo
 
 }
 
-function between(x, min, max) {
-  return x >= min && x <= max;
+function between(num, min, max) {
+  return num >= min && num <= max;
 }
 
 Level.prototype.checkSight = function() {
