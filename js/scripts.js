@@ -283,7 +283,7 @@ function drawHUD(expoOutput) {
     sanityMeter += "/";
   }
 
-  $("#HUD_con").text("<span id='HUD_sanity_output'>Sanity: " + sanityMeter + "</span><br>");
+  $("#HUD_con").text("Sanity: " + sanityMeter);
 
   if(sanity/5 <=4){
     $("#HUD_sanity_output").css("color", "red");
@@ -329,6 +329,8 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.visibleArray = [];
   this.perimeterArray = [];
   this.itemCatalog = ["A","B","C","D","E","F","G","H","J","K"];
+  this.shadowCount = Math.floor(complexity / 10);
+  this.shadows = [];
 }
 
 Level.prototype.createLevel = function() {
@@ -381,6 +383,12 @@ Level.prototype.createLevel = function() {
     for(var i = 0; i < this.xAxis/10; ++i){
       newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
       this.insertItems(newOrigin);
+    }
+
+    // Insert shadows
+    for(var i = 0; i < this.shadowCount; ++i){
+      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+      this.insertShadows(newOrigin);
     }
 
     // Inserts player icon.
@@ -443,19 +451,34 @@ function doKeyDown(event){
 
 function playerMovement(checkY, checkX){
   drawHUD();
+
+  // Picks up item in target space
   if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|b|k/)){
     levelArray[0].itemPickUp(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX]);
   }
+
+  // Encounters a Shadow in target space
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/S/)){
+    levelArray[0].shadowEncounter();
+  }
+
+  // Moves player to new space
   if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|b|k|\./)){
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = '.';
     levelArray[0].playerY += checkY;
     levelArray[0].playerX += checkX;
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = "@";
+    // levelArray[0].shadowMovement();
     levelArray[0].checkSight();
     levelArray[0].drawMap();
   } else{
     console.log("invalid");
   }
+};
+
+Level.prototype.shadowEncounter = function(){
+  sanity -= 10;
+  drawHUD("AIEEEEEEEE!");
 };
 
 Level.prototype.itemPickUp = function(item){
@@ -631,7 +654,13 @@ Level.prototype.removeDirt = function() {
   }
 };
 
+Level.prototype.insertShadows = function(origin) {
+  this.yOrigin = origin[0];
+  this.xOrigin = origin[1];
+  this.shadows.push(origin);
+  this.mapArray[this.yOrigin][this.xOrigin] = "S";
 
+}
 //Begin LoS Functions
 
 // Draws only the visible area of the map
@@ -819,7 +848,9 @@ window.addEventListener("keypress", doKeyDown, false);
 
 // Calls map creation
 window.onload = function () {
-  levelArray[0] = new Level(40, 40, 10, 10, 21, 10);
+
+  //(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength)
+  levelArray[0] = new Level(100, 100, 50, 10, 21, 10);
   levelArray[0].createLevel();
 };
 
