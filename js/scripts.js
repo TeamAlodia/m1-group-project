@@ -247,13 +247,13 @@ function initializeVault() {
 
 function drawHUD(expoOutput) {
 
-  var xCoord = vaultArray[currentVault].playerX
-  var yCoord = vaultArray[currentVault].playerY
-
-  $("#HUD_con").append("<span>" + expoOutput + "</span>");
-  $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
-  $("#HUD_con").append("<span>Keys: " + keys + "</span><br>");
-  $("#HUD_con").append("<span>Batteries: " + batteries + "</span><br><br>");
+  // var xCoord = vaultArray[currentVault].playerX
+  // var yCoord = vaultArray[currentVault].playerY
+  //
+  $("#log").append("<li class='visible' id='expo'>" + expoOutput + "</li>");
+  // $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
+  $("#HUD_con").text("<span>Keys: " + keys + "</span><br>");
+  $("#HUD_con").text("<span>Batteries: " + batteries + "</span><br><br>");
 
   flashlightMeter = "";
   for(var i = 1; i <= flashlightPower/5; ++i){
@@ -440,6 +440,9 @@ function doKeyDown(event){
 };
 
 function playerMovement(checkY, checkX){
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]/)){
+    levelArray[0].itemPickUp(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX]);
+  }
   if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|\./)){
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = '.';
     levelArray[0].playerY += checkY;
@@ -449,6 +452,43 @@ function playerMovement(checkY, checkX){
     levelArray[0].drawMap();
   } else{
     console.log("invalid");
+  }
+};
+
+Level.prototype.itemPickUp = function(item){
+  var specialItemExpo = [
+    "Water-damaged notebook: A small leatherbound notebook that's definitely seen better days. Nothing in it is legible, but it almost looks like my handwriting...",
+    "Emergency ration pack: It's a pack of protein bars and bottles of water. I'd forgotten how hungry I was. And thirsty, too.",
+    "Coin of indeterminate origin: This coin probably belongs in a museum.",
+    "Carved wooden figurine: I recognize this figure. It's the Hindu god Ganesha.",
+    "Small bunch of dried flowers: I've never seen flowers like these.",
+    "Broken pocket watch: My grandfather had one of these. It was his grandfather's. Or his great grandfather's?",
+    "Empty leather shoulder bag: Well, it's weatherbeaten and worn, but sturdy. And empty. Which is good, because my pockets are full.",
+    "Small vial: It's a glass vial. It's not labelled at all, but whatever's in it is glowing.",
+    "Card key with no markings: Have card key, will travel.",
+    "A pulsing crystal pendant: The pendant is the size of my little finger. There's a crack in the crystal, and it's warm to the touch.",
+    "Black feather pen: It looks like it came from a crow? Or maybe a raven?"
+  ];
+  if(item === "A"){
+    drawHUD(specialItemExpo[0]);
+  } else if (item === "B") {
+    drawHUD(specialItemExpo[1]);
+  } else if (item === "C") {
+    drawHUD(specialItemExpo[2]);
+  } else if (item === "D") {
+    drawHUD(specialItemExpo[3]);
+  } else if (item === "E") {
+    drawHUD(specialItemExpo[4]);
+  } else if (item === "F") {
+    drawHUD(specialItemExpo[5]);
+  } else if (item === "G") {
+    drawHUD(specialItemExpo[6]);
+  } else if (item === "H") {
+    drawHUD(specialItemExpo[7]);
+  } else if (item === "J") {
+    drawHUD(specialItemExpo[8]);
+  } else if (item === "K") {
+    drawHUD(specialItemExpo[9]);
   }
 };
 
@@ -767,7 +807,7 @@ window.addEventListener("keypress", doKeyDown, false);
 
 // Calls map creation
 window.onload = function () {
-  levelArray[0] = new Level(100, 100, 40, 10, 21, 10);
+  levelArray[0] = new Level(40, 40, 10, 10, 21, 10);
   levelArray[0].createLevel();
 };
 
