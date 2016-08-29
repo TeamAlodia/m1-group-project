@@ -425,6 +425,8 @@ Level.prototype.createLevel = function() {
 
 // Links keyboard input with actions: currently just movement
 function turnLogic(event){
+
+  currentExpo = "";
   // Flashlight Power Settings
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
     flashlightState = "lit";
