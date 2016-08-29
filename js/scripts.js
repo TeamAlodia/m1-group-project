@@ -250,17 +250,19 @@ function drawHUD(expoOutput) {
   // var xCoord = vaultArray[currentVault].playerX
   // var yCoord = vaultArray[currentVault].playerY
   //
-  $("#log").append("<li class='visible' id='expo'>" + expoOutput + "</li>");
+  if(expoOutput){
+    $("#log").append("<li class='visible' id='expo'>" + expoOutput + "</li>");
+  }
   // $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
-  $("#HUD_con").text("<span>Keys: " + keys + "</span><br>");
-  $("#HUD_con").text("<span>Batteries: " + batteries + "</span><br><br>");
+  $("#items").text("Keys: " + keys + " Batteries: " + batteries);
+  // $("#HUD_con").text("<span class = 'visible'>Batteries: " + batteries + "</span><br><br>");
 
   flashlightMeter = "";
   for(var i = 1; i <= flashlightPower/5; ++i){
     flashlightMeter += "/";
   }
 
-  $("#HUD_con").append("<span id='HUD_flashlight'>Flashlight:</span><span id='HUD_flashlight_meter'> " + flashlightMeter + "</span><br><br>");
+  $("#HUD_con").text("<span id='HUD_flashlight'>Flashlight:</span><span id='HUD_flashlight_meter'> " + flashlightMeter + "</span><br><br>");
 
   if(flashlightPower/5 <=4){
     $("#HUD_flashlight_meter").css("color", "red");
@@ -281,7 +283,7 @@ function drawHUD(expoOutput) {
     sanityMeter += "/";
   }
 
-  $("#HUD_con").append("<span id='HUD_sanity_output'>Sanity: " + sanityMeter + "</span><br>");
+  $("#HUD_con").text("<span id='HUD_sanity_output'>Sanity: " + sanityMeter + "</span><br>");
 
   if(sanity/5 <=4){
     $("#HUD_sanity_output").css("color", "red");
@@ -376,10 +378,10 @@ Level.prototype.createLevel = function() {
     this.insertSpecial();
 
     // Inserts Items
-    // for(var i = 0; i < this.xAxis/10; ++i){
-    //   newOrigin = this.floorList[(Math.floor(Math.random() * (this.wallList.length-1)) + 1)];
-    //   this.insertItems(newOrigin);
-    // }
+    for(var i = 0; i < this.xAxis/10; ++i){
+      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+      this.insertItems(newOrigin);
+    }
 
     // Inserts player icon.
     this.mapArray[this.playerY][this.playerX] = "@";
@@ -440,10 +442,11 @@ function doKeyDown(event){
 };
 
 function playerMovement(checkY, checkX){
-  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]/)){
+  drawHUD();
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|b|k/)){
     levelArray[0].itemPickUp(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX]);
   }
-  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|\./)){
+  if(levelArray[0].mapArray[levelArray[0].playerY + checkY][levelArray[0].playerX + checkX].match(/[A-K]|b|k|\./)){
     levelArray[0].mapArray[levelArray[0].playerY][levelArray[0].playerX] = '.';
     levelArray[0].playerY += checkY;
     levelArray[0].playerX += checkX;
@@ -489,6 +492,10 @@ Level.prototype.itemPickUp = function(item){
     drawHUD(specialItemExpo[8]);
   } else if (item === "K") {
     drawHUD(specialItemExpo[9]);
+  } else if (item === "k") {
+    keys += 1;
+  } else if (item === "b") {
+    batteries += 1;
   }
 };
 
@@ -530,11 +537,16 @@ Level.prototype.insertWalls = function() {
   this.drawPerimeter();
 };
 
-// Level.prototype.insertItems = function(origin) {
-//   this.yOrigin = origin[0];
-//   this.xOrigin = origin[1];
-//
-// };
+Level.prototype.insertItems = function(origin) {
+  this.yOrigin = origin[0];
+  this.xOrigin = origin[1];
+
+  if((Math.floor(Math.random() * 2) + 1) === 1){
+    this.mapArray[this.yOrigin][this.xOrigin] = "b";
+  } else {
+    this.mapArray[this.yOrigin][this.xOrigin] = "k";
+  }
+};
 
 // Inserts special items
 Level.prototype.insertSpecial = function() {
