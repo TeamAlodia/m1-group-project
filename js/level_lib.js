@@ -618,23 +618,40 @@ Shadow.prototype.shadowMovement = function(){
 };
 
 Level.prototype.shadowResolution = function() {
+  var newOrigin;
+
   for(var i = 0; i < this.shadowsArray.length; ++i) {
     if(this.shadowsArray[i].hitThisTurn === true){
       this.shadowsArray[i].strength -= 1;
       if(this.shadowsArray[i].strength <= 0){
         this.shadowsArray.splice(i, 1);
-        console.log("shadow killed");
       } else {
         this.shadowsArray[i].hitThisTurn = false;
         newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
         this.shadowsArray[i].shadowY = newOrigin[0];
         this.shadowsArray[i].shadowX = newOrigin[1];
-        console.log("shadow teleported");
       }
+    }
+  }
+  if(this.shadowsArray.length < this.shadowCount) {
+    var chance = (this.shadowCount - this.shadowsArray.length);
+    var random = Math.floor(Math.random() * (this.shadowCount - 1)) + 1
+    if(chance >= random){
+      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+      this.yOrigin = newOrigin[0];
+      this.xOrigin = newOrigin[1];
+      this.shadowsArray.push(new Shadow(this.yOrigin, this.xOrigin, 2, this.levelNum));
     }
   }
 }
 
+Level.prototype.shadowRespawn = function() {
+
+  var chance = difference;
+
+
+
+}
 //---------- Other functions ----------//
 
 function initializeLevel(levelArray) {
