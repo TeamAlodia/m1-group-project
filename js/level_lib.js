@@ -83,6 +83,7 @@ Level.prototype.createLevel = function() {
   // Insert shadows
 
   this.createShadows(this.levelNum);
+  console.log("createShadows Executed")
 
   // Inserts player icon.
   this.mapArray[this.playerY][this.playerX] = "@";
@@ -253,7 +254,7 @@ Level.prototype.itemPickUp = function(item, batteries, keys){
     playRandomItemSound();
     batteries += 1;
   }
-  
+
 };
 
 Level.prototype.insertItems = function(origin) {
@@ -288,6 +289,7 @@ Level.prototype.createShadows = function(onLevel){
     this.yOrigin = newOrigin[0];
     this.xOrigin = newOrigin[1];
     this.shadowsArray.push(new Shadow(this.yOrigin, this.xOrigin, 2, onLevel));
+    console.log("Shadow Created");
   }
 };
 
@@ -421,16 +423,6 @@ Level.prototype.checkSight = function() {
     this.drawline(0,0,toX,toY,flashlightState);
   }
 
-  this.checkLight = true;
-
-  for(var i = 0; i < this.flashlightPerimeter.length ; ++i){
-    var toY = this.flashlightPerimeter[i][0];
-    var toX = this.flashlightPerimeter[i][1];
-
-    // (origin y, origin x, draw to y, draw to x) ??
-    this.drawline(0,0,toX,toY,flashlightState);
-  }
-
   for(var i = 0; i < this.shadowsArray.length; ++i){
 
     var shadowY = this.shadowsArray[i].shadowY;
@@ -439,6 +431,16 @@ Level.prototype.checkSight = function() {
     if(between(shadowY, this.playerY - this.sightLength, this.playerY + this.sightLength) && between(shadowX, this.playerX - this.sightLength, this.playerX + this.sightLength)) {
       this.visibleArray[this.sightLength + ((shadowY - this.playerY))][this.sightLength + ((shadowX - this.playerX))] = "S";
     }
+  }
+
+  this.checkLight = true;
+
+  for(var i = 0; i < this.flashlightPerimeter.length ; ++i){
+    var toY = this.flashlightPerimeter[i][0];
+    var toX = this.flashlightPerimeter[i][1];
+
+    // (origin y, origin x, draw to y, draw to x) ??
+    this.drawline(0,0,toX,toY,flashlightState);
   }
 };
 
@@ -549,8 +551,16 @@ Level.prototype.drawline = function(x0,y0,x1,y1,flashlightState){
 Level.prototype.plot = function(x,y,flashlightState){
 
   // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
-
+  var newOrigin;
   if(this.checkLight){
+    if(this.visibleArray[this.sightLength+y][this.sightLength+x] === "S") {
+      for(var i = 0; i < this.shadowsArray.length; ++i){
+        if(this.shadowsArray[i].shadowX === this.playerX+x && this.shadowsArray[i].shadowY === this.playerY+y) {
+          this.shadowsArray[i].hitThisTurn = true;
+        }
+      }
+    }
+
     this.visibleArray[this.sightLength+y][this.sightLength+x] = "<span class='" + flashlightState + "'>" +  this.mapArray[this.playerY+y][this.playerX+x] + "<span>";
   }else{
     this.visibleArray[this.sightLength+y][this.sightLength+x] = this.mapArray[this.playerY+y][this.playerX+x];
@@ -588,11 +598,11 @@ var Shadow = function(shadowY, shadowX, strength, onLevel){
   this.lastSeen = [];
   this.strength = strength;
   this.onLevel = onLevel;
+  this.hitThisTurn = false;
 }
 
 Shadow.prototype.shadowMovement = function(){
   // console.log(this.shadowY, this.shadowX);
-  debugger
   if(Math.pow(levelArray[this.onLevel].playerY-this.shadowY,2) + Math.pow(levelArray[this.onLevel].playerX-this.shadowX,2) <= Math.pow(levelArray[this.onLevel].sightLength,2)) {
     if(this.shadowY > levelArray[this.onLevel].playerY){
       this.shadowY -= 1;
@@ -606,6 +616,24 @@ Shadow.prototype.shadowMovement = function(){
     }
   }
 };
+
+Level.prototype.shadowResolution = function() {
+  for(var i = 0; i < this.shadowsArray.length; ++i) {
+    if(this.shadowsArray[i].hitThisTurn === true){
+      this.shadowsArray[i].strength -= 1;
+      if(this.shadowsArray[i].strength <= 0){
+        this.shadowsArray.splice(i, 1);
+        console.log("shadow killed");
+      } else {
+        this.shadowsArray[i].hitThisTurn = false;
+        newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+        this.shadowsArray[i].shadowY = newOrigin[0];
+        this.shadowsArray[i].shadowX = newOrigin[1];
+        console.log("shadow teleported");
+      }
+    }
+  }
+}
 
 //---------- Other functions ----------//
 

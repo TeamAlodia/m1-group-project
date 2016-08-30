@@ -141,6 +141,8 @@ function turnLogic(event){
     levelArray[currentLevel].shadowsArray[i].shadowMovement();
   }
 
+  levelArray[currentLevel].shadowResolution();
+
   // Draw Player Sight
   levelArray[currentLevel].checkSight();
   levelArray[currentLevel].drawMap();
@@ -159,5 +161,5 @@ window.onload = function () {
   // levelArray[0] = new Level(100, 100, 50, 10, 21, 10);
 
   levelArray = initializeLevel(levelArray);
-  levelArray[currentLevel].createLevel();
+  levelArray = initializeLevel(levelArray);
 };
