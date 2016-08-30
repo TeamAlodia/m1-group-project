@@ -91,7 +91,7 @@ Level.prototype.createLevel = function() {
   if (levelArray.length > 1) {
     for(var i = 0; i < this.numberOfHatches; ++i){
     newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
-    this.placeExits(newOrigin,'O');
+    this.placeExits(newOrigin,"v");
     }
   }
   // Insert shadows
@@ -622,7 +622,7 @@ Level.prototype.playerMovement = function(checkY, checkX){
   }
 
   // Moves player down a level
-  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/O/g)) {
+  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/v/g)) {
     currentLevel --;
 
   }

@@ -134,8 +134,22 @@ function turnLogic(event){
       levelArray[currentLevel].playerMovement(1, 1);
     }
   }
+  //sanity/battery adjustment (light condition)
+  if (flashlightState === "superlit"){
+    flashlightPower -= 2;
+    if (sanity < 100) {
+      sanity ++;
+    }
+  } else if (flashlightState === "lit") {
+    flashlightPower --;
+    sanity --;
+  } else {
+    sanity -= 2;
+  }
+  //sanity/battery adjustment (shadow touch)
 
   // Draw HUD
+  console.log('sanity: '+ sanity + 'battery: '+ flashlightPower);
   drawHUD(currentExpo);
 
   // Shadow Movement
