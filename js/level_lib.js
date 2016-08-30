@@ -70,9 +70,6 @@ Level.prototype.createLevel = function() {
   // Updates array of floor locations
   this.floorList = this.createIndex('.');
 
-  // Updates map with walls
-  this.insertWalls();
-
   // Inserts Special Items
   this.insertSpecial();
 
@@ -84,22 +81,47 @@ Level.prototype.createLevel = function() {
   //insert ladders
   for(var i = 0; i < this.numberOfLadders; ++i){
     newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
-    this.placeExits(newOrigin,'^');
-  }
-
-  //insert hatches
-  if (levelArray.length > 1) {
-    for(var i = 0; i < this.numberOfHatches; ++i){
-    newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
-    this.placeExits(newOrigin,"v");
+    this.placeExits(newOrigin,"^");
+    for(var y = -1; y <= 1; ++y) {
+      for(var x = -1; x <= 1; ++x) {
+        if(this.mapArray[newOrigin[0] + y][newOrigin[1] + x] === "#"){
+          this.mapArray[newOrigin[0] + y][newOrigin[1] + x] = ".";
+          // this.floorList.push(this.mapArray[newOrigin[0] + y][newOrigin[1] + x]);
+        }
+      }
     }
   }
+
+  //insert hatch and moves player to it
+  if (levelArray.length > 1) {
+    for(var i = 0; i < this.numberOfHatches; ++i){
+      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+
+      this.placeExits(newOrigin,"v");
+      for(var y = -1; y <= 1; ++y) {
+        for(var x = -1; x <= 1; ++x) {
+          if(this.mapArray[newOrigin[0] + y][newOrigin[1] + x] === "#"){
+            this.mapArray[newOrigin[0] + y][newOrigin[1] + x] = ".";
+            // this.floorList.push(this.mapArray[newOrigin[0] + y][newOrigin[1] + x]);
+          }
+        }
+      }
+      this.playerY = newOrigin[0] + 1;
+      this.playerX = newOrigin[1] + 1;
+    }
+  }
+    this.floorList = this.createIndex('.');
+
+  // Updates map with walls
+  this.insertWalls();
+
   // Insert shadows
 
   this.createShadows(this.levelNum);
   console.log("createShadows Executed")
 
   // Inserts player icon.
+
   this.mapArray[this.playerY][this.playerX] = "@";
 
   // Removes all Xs from the map array and replaces them with "&nbsp;"
@@ -605,14 +627,6 @@ Level.prototype.playerMovement = function(checkY, checkX){
     currentExpo = this.itemPickUp(this.mapArray[this.playerY + checkY][this.playerX + checkX], batteries, keys);
   }
 
-  // Moves player to new space
-  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k|\./)){
-    this.mapArray[this.playerY][this.playerX] = '.';
-    this.playerY += checkY;
-    this.playerX += checkX;
-    this.mapArray[this.playerY][this.playerX] = "@";
-  }
-
   // Moves player up to new level
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/\^/g)) {
     currentLevel ++;
@@ -624,8 +638,16 @@ Level.prototype.playerMovement = function(checkY, checkX){
   // Moves player down a level
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/v/g)) {
     currentLevel --;
-
   }
+
+  // Moves player to new space
+  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k|\./)){
+    this.mapArray[this.playerY][this.playerX] = '.';
+    this.playerY += checkY;
+    this.playerX += checkX;
+    this.mapArray[this.playerY][this.playerX] = "@";
+  }
+
 };
 
 //---------- Shadow functions ----------//
