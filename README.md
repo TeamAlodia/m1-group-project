@@ -39,6 +39,11 @@
     -hall length: pick random direction. pick random length (by setting min and max). Build a hallway (represented by '.') in that direction for that length.
     sightlength:
 
+  * function that creates randomly placed ladders and hatches and takes argument to determine number of each  
+    -stepping on ladders takes you up a level
+    -stepping on hatches takes you down a level (no hatches on first level)
+
+
   -LOS
   -item Generation
   -shadow spawning/behavior

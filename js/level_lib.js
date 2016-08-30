@@ -1,4 +1,4 @@
-var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum) {
+var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches) {
   this.playerX;
   this.playerY;
   this.vaultArray = [];
@@ -24,6 +24,8 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.flashlightArray = [];
   this.checkLight;
   this.levelNum = levelNum;
+  this.numberOfLadders = numberOfLadders;
+  this.numberOfHatches = numberOfHatches;
 }
 
 //---------- Level creation functions ----------//
@@ -79,7 +81,19 @@ Level.prototype.createLevel = function() {
     newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
     this.insertItems(newOrigin);
   }
+  //insert ladders
+  for(var i = 0; i < this.numberOfLadders; ++i){
+    newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+    this.placeExits(newOrigin,'^');
+  }
 
+  //insert hatches
+  if (levelArray.length > 1) {
+    for(var i = 0; i < this.numberOfHatches; ++i){
+    newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+    this.placeExits(newOrigin,'O');
+    }
+  }
   // Insert shadows
 
   this.createShadows(this.levelNum);
@@ -201,6 +215,16 @@ Level.prototype.removeDirt = function() {
     }
   }
 };
+
+Level.prototype.placeExits = function (origin, type) {
+  this.yOrigin = origin[0];
+  this.xOrigin = origin[1];
+
+  this.mapArray[this.yOrigin][this.xOrigin] = type;
+  };
+
+
+
 
 Level.prototype.itemPickUp = function(item, batteries, keys){
   var specialItemExpo = [
@@ -588,6 +612,20 @@ Level.prototype.playerMovement = function(checkY, checkX){
     this.playerX += checkX;
     this.mapArray[this.playerY][this.playerX] = "@";
   }
+
+  // Moves player up to new level
+  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/\^/g)) {
+    currentLevel ++;
+    if (!levelArray[currentLevel]) {
+      levelArray = initializeLevel(levelArray);
+    }
+  }
+
+  // Moves player down a level
+  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/O/g)) {
+    currentLevel --;
+
+  }
 };
 
 //---------- Shadow functions ----------//
@@ -638,7 +676,7 @@ Level.prototype.shadowResolution = function() {
 //---------- Other functions ----------//
 
 function initializeLevel(levelArray) {
-  levelArray[levelArray.length] = new Level(100, 100, 50, 10, 21, 10,levelArray.length);
+  levelArray[levelArray.length] = new Level(100, 100, 50, 10, 21, 10,levelArray.length, 10,10);
   levelArray[levelArray.length - 1].levelNumber = levelArray.length - 1;
   levelArray[levelArray.length - 1].createLevel();
 

@@ -20,7 +20,7 @@ function drawHUD(expoOutput) {
     $("#log").append("<li class='lit' id='expo'>" + expoOutput + "</li>");
   }
   // $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
-  $("#items").text("Keys: " + keys + " Batteries: " + batteries);
+  $("#items").text("Keys: " + keys + " Batteries: " + batteries + " Level: " + (parseInt(currentLevel) + 1));
   // $("#HUD_con").text("<span class = 'visible'>Batteries: " + batteries + "</span><br><br>");
 
   flashlightMeter = "";
@@ -56,6 +56,8 @@ function drawHUD(expoOutput) {
   }else{
     $("#HUD_sanity_output").css("color", "#00e600");
   }
+
+
 }
 
 function updateFlashlight() {
@@ -160,6 +162,5 @@ window.onload = function () {
   //(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength)
   // levelArray[0] = new Level(100, 100, 50, 10, 21, 10);
 
-  levelArray = initializeLevel(levelArray);
   levelArray = initializeLevel(levelArray);
 };
