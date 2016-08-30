@@ -215,32 +215,45 @@ Level.prototype.itemPickUp = function(item, batteries, keys){
     "A pulsing crystal pendant: The pendant is the size of my little finger. There's a crack in the crystal, and it's warm to the touch.",
     "Black feather pen: It looks like it came from a crow? Or maybe a raven?"
   ];
+
   if(item === "A"){
+    playSound(1);
     return specialItemExpo[0];
   } else if (item === "L") {
+    playSound(2);
     return specialItemExpo[1];
   } else if (item === "C") {
+    playSound(3);
     return specialItemExpo[2];
   } else if (item === "D") {
+    playSound(4);
     return specialItemExpo[3];
   } else if (item === "E") {
+    playSound(5);
     return specialItemExpo[4];
   } else if (item === "F") {
+    playSound(6);
     return specialItemExpo[5];
   } else if (item === "G") {
+    playSound(7);
     return specialItemExpo[6];
   } else if (item === "H") {
+    playSound(8);
     return specialItemExpo[7];
   } else if (item === "J") {
+    playSound(9);
     return specialItemExpo[8];
   } else if (item === "K") {
+    playSound(10);
     return specialItemExpo[9];
   } else if (item === "k") {
+    playRandomItemSound();
     keys += 1;
   } else if (item === "b") {
+    playRandomItemSound();
     batteries += 1;
   }
-
+  
 };
 
 Level.prototype.insertItems = function(origin) {

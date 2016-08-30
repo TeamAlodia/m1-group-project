@@ -29,3 +29,35 @@
   * drawFloor - takes the floor array and draws it for player. Uses appended spans for each horizontal line.
 * doKeyDown - interprets keypresses (currently qweadzxc as direction keys)
   * playerMovement - takes in two integers related to desired movement and checks the map to see if movement is viable. Redraws the map if it is.
+
+  # Specifications
+
+  All of this is contained within the level object
+
+  1. Map Generation
+  * create new level object with the following properties
+    -hall length: pick random direction. pick random length (by setting min and max). Build a hallway (represented by '.') in that direction for that length.
+    sightlength:
+
+  -LOS
+  -item Generation
+  -shadow spawning/behavior
+  -flashlight
+
+  ## Audio
+
+  * Background music plays in a loop with the gameplay.
+    * Input: User loads game.
+    * Output: Background music starts and plays on repeat at low volume.
+
+  * Background music stops when gameplay ends.
+    * Input: Player finishes game.
+    * Output: Background music stops.
+
+  * Picking up special items triggers item-specific sounds.
+    * Input: Player picks up notebook.
+    * Output: Voiceover for notebook plays.
+
+  * Picking up a key or battery triggers one of three sounds.
+    * Input: Player picks up a key.
+    * Output: Voiceover for "non-special item" plays.
