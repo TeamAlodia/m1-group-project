@@ -1,4 +1,4 @@
-var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches) {
+var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches, numberOfVaults) {
   this.playerX;
   this.playerY;
   this.vaultArray = [];
@@ -26,6 +26,7 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.levelNum = levelNum;
   this.numberOfLadders = numberOfLadders;
   this.numberOfHatches = numberOfHatches;
+  this.numberOfVaults = numberOfVaults
 }
 
 //---------- Level creation functions ----------//
@@ -96,7 +97,6 @@ Level.prototype.createLevel = function() {
   if (levelArray.length > 1) {
     for(var i = 0; i < this.numberOfHatches; ++i){
       newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
-
       this.placeExits(newOrigin,"v");
       for(var y = -1; y <= 1; ++y) {
         for(var x = -1; x <= 1; ++x) {
@@ -115,8 +115,11 @@ Level.prototype.createLevel = function() {
   // Updates map with walls
   this.insertWalls();
 
-  // Insert shadows
+  // Insert vault entrances
+  this.placeVaults();
 
+
+  // Insert shadows
   this.createShadows(this.levelNum);
   console.log("createShadows Executed")
 
@@ -130,6 +133,18 @@ Level.prototype.createLevel = function() {
   // Draws map
   this.checkSight();
   this.drawMap();
+};
+
+Level.prototype.placeVaults = function() {
+  var newOrigin;
+
+  for(var i = 0; i <this.numberOfVaults; ++i){
+    do{
+      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+    } while(this.mapArray[newOrigin[0]][newOrigin[1]] !== '.');
+
+    this.mapArray[newOrigin[0]][newOrigin[1]] = 'O';
+  }
 };
 
 // Takes in a character, finds all instances of the character in the map and creates a new array with their locations
@@ -705,17 +720,10 @@ Level.prototype.shadowResolution = function() {
   }
 }
 
-Level.prototype.shadowRespawn = function() {
-
-  var chance = difference;
-
-
-
-}
 //---------- Other functions ----------//
 
 function initializeLevel(levelArray) {
-  levelArray[levelArray.length] = new Level(100, 100, 50, 10, 21, 10,levelArray.length, 10,10);
+  levelArray[levelArray.length] = new Level(100, 100, 50, 10, 21, 10,levelArray.length, 10,10, 3);
   levelArray[levelArray.length - 1].levelNumber = levelArray.length - 1;
   levelArray[levelArray.length - 1].createLevel();
 
