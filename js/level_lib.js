@@ -496,12 +496,14 @@ Level.prototype.checkSight = function() {
 
   this.checkLight = true;
 
-  for(var i = 0; i < this.flashlightPerimeter.length ; ++i){
-    var toY = this.flashlightPerimeter[i][0];
-    var toX = this.flashlightPerimeter[i][1];
+  if(flashlightState !== "off"){
+    for(var i = 0; i < this.flashlightPerimeter.length ; ++i){
+      var toY = this.flashlightPerimeter[i][0];
+      var toX = this.flashlightPerimeter[i][1];
 
-    // (origin y, origin x, draw to y, draw to x) ??
-    this.drawline(0,0,toX,toY,flashlightState);
+      // (origin y, origin x, draw to y, draw to x) ??
+      this.drawline(0,0,toX,toY,flashlightState);
+    }
   }
 };
 
@@ -637,30 +639,30 @@ Level.prototype.plot = function(x,y,flashlightState){
 //--------------------//
 
 Level.prototype.playerMovement = function(checkY, checkX){
+
+
   // Picks up item in target space
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k/)){
     currentExpo = this.itemPickUp(this.mapArray[this.playerY + checkY][this.playerX + checkX], batteries, keys);
   }
-
-  // Moves player up to new level
-  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/\^/g)) {
-    currentLevel ++;
-    if (!levelArray[currentLevel]) {
-      levelArray = initializeLevel(levelArray);
-    }
-  }
-
-  // Moves player down a level
-  if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/v/g)) {
-    currentLevel --;
-  }
-
   // Moves player to new space
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k|\./)){
     this.mapArray[this.playerY][this.playerX] = '.';
     this.playerY += checkY;
     this.playerX += checkX;
     this.mapArray[this.playerY][this.playerX] = "@";
+  } else {
+    // Moves player up to new level
+    if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/\^/g)) {
+      currentLevel ++;
+      if (!levelArray[currentLevel]) {
+        levelArray = initializeLevel(levelArray);
+      }
+    }
+    // Moves player down a level
+    if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/v/g)) {
+      currentLevel --;
+    }
   }
 
 };
