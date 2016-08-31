@@ -720,9 +720,10 @@ Level.prototype.shadowResolution = function() {
   for(var i = 0; i < this.shadowsArray.length; ++i) {
     if(this.shadowsArray[i].hitThisTurn === true){
       this.shadowsArray[i].strength -= 1;
-
+      playSound(17);
       if(this.shadowsArray[i].strength <= 0){
         this.shadowsArray.splice(i, 1);
+        playSound(16);
       } else {
         this.shadowsArray[i].hitThisTurn = false;
         newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
@@ -732,6 +733,7 @@ Level.prototype.shadowResolution = function() {
       console.log("shadow has teleported away");
     } else if(this.shadowsArray[i].shadowY - this.playerY <= 1 && this.shadowsArray[i].shadowY - this.playerY >= -1 && this.shadowsArray[i].shadowX - this.playerX <= 1 && this.shadowsArray[i].shadowX - this.playerX >= -1){
       sanity -= 5;
+      playSound(15);
       console.log("shadow has damaged character " + sanity);
     }
   }
