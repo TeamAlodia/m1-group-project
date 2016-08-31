@@ -26,6 +26,18 @@ body{
   color: #ccffcc;
 }
 
+.item{
+  color: #d279d2;
+}
+
+.exit{
+  color: #b32d00;
+}
+
+.consumable{
+  color: #732673;
+}
+
 #door_span{
   color: green;
 }
