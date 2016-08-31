@@ -409,12 +409,12 @@ Level.prototype.drawMap = function() {
   $("#main_con").append("<br>");
   }
 
-  for(var y = 0; y < this.mapArray.length; ++y){
-    for(var x = 0; x < this.mapArray.length; ++x){
-      $("#help").append(this.mapArray[y][x]);
-    }
-    $("#help").append("<br>");
-  }
+  // for(var y = 0; y < this.mapArray.length; ++y){
+  //   for(var x = 0; x < this.mapArray.length; ++x){
+  //     $("#help").append(this.mapArray[y][x]);
+  //   }
+  //   $("#help").append("<br>");
+  // }
 };
 
 // Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)

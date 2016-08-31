@@ -1,4 +1,4 @@
-var keys = 99;
+var keys = 0;
 var batteries = 0;
 var flashlightPower = 100;
 var flashlightMeter = "";
@@ -21,7 +21,7 @@ function drawHUD(expoOutput) {
     $("#log").text(expoOutput);
   }
   // $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
-  $("#items").text("Keys: " + keys + " Batteries: " + batteries + " Level: " + (parseInt(currentLevel) + 1));
+  $("#items").text("Keys: " + keys + " | Batteries: " + batteries + " | Level: " + (parseInt(currentLevel) + 1));
   // $("#HUD_con").text("<span class = 'visible'>Batteries: " + batteries + "</span><br><br>");
 
   flashlightMeter = "";
@@ -73,7 +73,7 @@ function updateFlashlight() {
 }
 
 function gameOver(){
-  drawHUD("Shit's gone South. Press 'spacebar' to restart.");
+  drawHUD("You have succumbed to the Shadows. Press 'spacebar' to restart.");
 
   if(event.keyCode === 32) {
     location.reload();
@@ -220,4 +220,5 @@ window.addEventListener("keypress", turnLogic, false);
 // Calls map creation
 window.onload = function () {
   levelArray = initializeLevel(levelArray);
+  drawHUD();
 };

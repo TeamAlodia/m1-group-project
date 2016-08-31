@@ -1,6 +1,6 @@
 var bgm = new Audio("media/bgm.mp3");
 bgm.loop = true;
-var voices = [
+var sfx = [
 new Audio("media/vo_intro.mp3"),
 new Audio("media/vo_item_0.mp3"),
 new Audio("media/vo_item_1.mp3"),
@@ -22,17 +22,18 @@ new Audio("media/shadow_takedamage.mp3")
 ];
 
 function playSound(newSoundID) {
-  voices.forEach(function(voice) {
-    if (!voice.ended) {
-      voice.pause();
+  sfx.forEach(function(fx) {
+    if (newSoundID < 15 && !fx.ended) {
+      fx.pause();
+      fx.currentTime = 0;
     }
   });
-  voices[newSoundID].play();
+  sfx[newSoundID].play();
 }
 
 function playRandomItemSound() {
-  var index = Math.floor(Math.random() * 3) + 1;
-  playSound(voices.length - index);
+  var index = Math.floor(Math.random() * 3) + 3;
+  playSound(sfx.length - index);
 }
 
 // .play();
