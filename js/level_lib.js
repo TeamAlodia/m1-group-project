@@ -715,9 +715,12 @@ Shadow.prototype.shadowMovement = function(){
 Level.prototype.shadowResolution = function() {
   var newOrigin;
 
+
+  // Checks to see if any shadows have been hit by flashlight and teleports them if they have been.
   for(var i = 0; i < this.shadowsArray.length; ++i) {
     if(this.shadowsArray[i].hitThisTurn === true){
       this.shadowsArray[i].strength -= 1;
+
       if(this.shadowsArray[i].strength <= 0){
         this.shadowsArray.splice(i, 1);
       } else {
@@ -726,8 +729,14 @@ Level.prototype.shadowResolution = function() {
         this.shadowsArray[i].shadowY = newOrigin[0];
         this.shadowsArray[i].shadowX = newOrigin[1];
       }
+      console.log("shadow has teleported away");
+    } else if(this.shadowsArray[i].shadowY - this.playerY <= 1 && this.shadowsArray[i].shadowY - this.playerY >= -1 && this.shadowsArray[i].shadowX - this.playerX <= 1 && this.shadowsArray[i].shadowX - this.playerX >= -1){
+      sanity -= 5;
+      console.log("shadow has damaged character " + sanity);
     }
   }
+
+  // Respawn chance for shadows
   if(this.shadowsArray.length < this.shadowCount) {
     var chance = (this.shadowCount - this.shadowsArray.length);
     var random = Math.floor(Math.random() * (this.shadowCount - 1)) + 1
@@ -743,7 +752,8 @@ Level.prototype.shadowResolution = function() {
 //---------- Other functions ----------//
 
 function initializeLevel(levelArray) {
-  levelArray[levelArray.length] = new Level(100, 100, 50, 10, 21, 10,levelArray.length, 10,10, 3);
+  //(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches, numberOfVaults)
+  levelArray[levelArray.length] = new Level(100, 100, 100, 5, 21, 10,levelArray.length, 2,2, 3);
   levelArray[levelArray.length - 1].levelNumber = levelArray.length - 1;
   levelArray[levelArray.length - 1].createLevel();
 

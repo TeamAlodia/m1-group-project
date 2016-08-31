@@ -115,12 +115,15 @@ function turnLogic(event){
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
     flashlightState = "lit";
     console.log("lit")
+    return
   }else if(event.keyCode === 115 && flashlightState === "lit" && flashlightPower > 0){
     flashlightState = "superlit";
     console.log("superlit")
+    return
   }else if(event.keyCode === 115){
     flashlightState = "off";
     console.log("off")
+    return
   }
 
   if(inVault){
@@ -196,10 +199,11 @@ function turnLogic(event){
     levelArray[currentLevel].shadowsArray[i].shadowMovement();
   }
 
+
+  levelArray[currentLevel].checkSight();
   levelArray[currentLevel].shadowResolution();
 
   // Draw Player Sight
-  levelArray[currentLevel].checkSight();
   levelArray[currentLevel].drawMap();
 
 };
