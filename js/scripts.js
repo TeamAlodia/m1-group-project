@@ -81,6 +81,11 @@ function updateFlashlight() {
 // Links keyboard input with actions: currently just movement
 function turnLogic(event){
 
+  if (event.keyCode === 104 ) {
+    $("#help").toggle();
+    return;
+  }
+
   currentExpo = "";
   // Flashlight Power Settings
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
@@ -132,8 +137,6 @@ function turnLogic(event){
     }else if (event.keyCode === 99){
       levelArray[currentLevel].currentDirection = "se";
       levelArray[currentLevel].playerMovement(1, 1);
-    }else if (event.keyCode === 104 ) {
-      $("#help").toggle();  
     }
   }
 
