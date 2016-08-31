@@ -115,13 +115,19 @@ function turnLogic(event){
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
     flashlightState = "lit";
     console.log("lit")
+    levelArray[currentLevel].checkSight();
+    levelArray[currentLevel].drawMap();
     return
   }else if(event.keyCode === 115 && flashlightState === "lit" && flashlightPower > 0){
     flashlightState = "superlit";
     console.log("superlit")
+    levelArray[currentLevel].checkSight();
+    levelArray[currentLevel].drawMap();
     return
   }else if(event.keyCode === 115){
     flashlightState = "off";
+    levelArray[currentLevel].checkSight();
+    levelArray[currentLevel].drawMap();
     console.log("off")
     return
   }

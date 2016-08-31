@@ -497,6 +497,43 @@ Level.prototype.checkSight = function() {
     this.drawline(0,0,toX,toY,flashlightState);
   }
 
+  for(var i = -1; i > boundNorth ; --i){
+    if(!(this.mapArray[this.playerY + i][this.playerX].match(/#|B/))){
+      this.visibleArray[this.sightLength + i][this.sightLength - 1] = this.mapArray[this.playerY + i][this.playerX - 1];
+      this.visibleArray[this.sightLength + i][this.sightLength + 1] = this.mapArray[this.playerY + i][this.playerX + 1];
+    }else{
+      break;
+    }
+  }
+
+  for(var i = 0; i < boundSouth ; ++i){
+    if(!(this.mapArray[this.playerY + i][this.playerX].match(/#|B/))){
+      this.visibleArray[this.sightLength + i][this.sightLength - 1] = this.mapArray[this.playerY + i][this.playerX - 1];
+      this.visibleArray[this.sightLength + i][this.sightLength + 1] = this.mapArray[this.playerY + i][this.playerX + 1];
+    }else{
+      break;
+    }
+  }
+
+  for(var i = 0; i < boundEast ; ++i){
+    if(!(this.mapArray[this.playerY][this.playerX + i].match(/#|B/))){
+      this.visibleArray[this.sightLength - 1][this.sightLength + i] = this.mapArray[this.playerY - 1][this.playerX + i];
+      this.visibleArray[this.sightLength + 1][this.sightLength + i] = this.mapArray[this.playerY + 1][this.playerX + i];
+    }else{
+      break;
+    }
+  }
+
+  for(var i = -1; i > boundWest ; --i){
+    debugger
+    if(!(this.mapArray[this.playerY][this.playerX + i].match(/#|B/))){
+      this.visibleArray[this.sightLength - 1][this.sightLength + i] = this.mapArray[this.playerY - 1][this.playerX + i];
+      this.visibleArray[this.sightLength + 1][this.sightLength + i] = this.mapArray[this.playerY + 1][this.playerX + i];
+    }else{
+      break;
+    }
+  }
+
   for(var i = 0; i < this.shadowsArray.length; ++i){
 
     var shadowY = this.shadowsArray[i].shadowY;
