@@ -671,7 +671,8 @@ Level.prototype.playerMovement = function(checkY, checkX){
       if (currentLevel === 3) {
         // levelArray = initializeLevel(levelArray);
         currentLevel --;
-        console.log('you win');
+        winState = "win";
+        return;
       } else if (!levelArray[currentLevel]) {
         levelArray = initializeLevel(levelArray);
       }

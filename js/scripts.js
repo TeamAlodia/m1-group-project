@@ -11,6 +11,7 @@ var inVault = false;
 var levelArray = [];
 var currentLevel = 0;
 var currentExpo;
+var winState;
 
 function drawHUD(expoOutput) {
   // var xCoord = vaultArray[currentVault].playerX
@@ -79,10 +80,21 @@ function gameOver(){
   }
 }
 
+function gameWin() {
+  drawHUD("You escape with your sanity intact. Press 'spacebar' to restart.");
+
+  if(event.keyCode === 32) {
+    location.reload();
+  }
+}
+
 // Links keyboard input with actions: currently just movement
 function turnLogic(event){
   if(sanity <= 0){
     gameOver();
+    return;
+  } else if (winState){
+    gameWin();
     return;
   }
 
