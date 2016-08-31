@@ -79,9 +79,23 @@ Level.prototype.createLevel = function() {
     newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
     this.insertItems(newOrigin);
   }
+
   //insert ladders
   for(var i = 0; i < this.numberOfLadders; ++i){
-    newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+    var check;
+    do {
+      check = true;
+      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
+      if(Math.abs(newOrigin[0] - this.playerY) < 11){
+        check = false;
+      }
+      if(Math.abs(newOrigin[1] - this.playerX) < 11){
+        check = false;
+      }
+      console.log(newOrigin[0] - this.playerY)
+      console.log(newOrigin[1] - this.playerX)
+    }while(check === false);
+    debugger
     this.placeExits(newOrigin,"^");
     for(var y = -1; y <= 1; ++y) {
       for(var x = -1; x <= 1; ++x) {
@@ -395,6 +409,12 @@ Level.prototype.drawMap = function() {
   $("#main_con").append("<br>");
   }
 
+  for(var y = 0; y < this.mapArray.length; ++y){
+    for(var x = 0; x < this.mapArray.length; ++x){
+      $("#help").append(this.mapArray[y][x]);
+    }
+    $("#help").append("<br>");
+  }
 };
 
 // Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
@@ -525,7 +545,7 @@ Level.prototype.checkSight = function() {
   }
 
   for(var i = -1; i > boundWest ; --i){
-    debugger
+
     if(!(this.mapArray[this.playerY][this.playerX + i].match(/#|B/))){
       this.visibleArray[this.sightLength - 1][this.sightLength + i] = this.mapArray[this.playerY - 1][this.playerX + i];
       this.visibleArray[this.sightLength + 1][this.sightLength + i] = this.mapArray[this.playerY + 1][this.playerX + i];
