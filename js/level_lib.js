@@ -277,33 +277,43 @@ Level.prototype.itemPickUp = function(item){
 
   if(item === "A"){
     playSound(1);
+    sanity += 20;
     return specialItemExpo[0];
   } else if (item === "L") {
     playSound(2);
+    sanity += 15;
     return specialItemExpo[1];
   } else if (item === "C") {
     playSound(3);
+    sanity += 10;
     return specialItemExpo[2];
   } else if (item === "D") {
     playSound(4);
+    sanity += 20;
     return specialItemExpo[3];
   } else if (item === "E") {
     playSound(5);
+    sanity += 25;
     return specialItemExpo[4];
   } else if (item === "F") {
     playSound(6);
+    sanity += 20;
     return specialItemExpo[5];
   } else if (item === "G") {
     playSound(7);
+    sanity += 15;
     return specialItemExpo[6];
   } else if (item === "H") {
     playSound(8);
+    sanity += 10;
     return specialItemExpo[7];
   } else if (item === "J") {
     playSound(9);
+    sanity += 25;
     return specialItemExpo[8];
   } else if (item === "K") {
     playSound(10);
+    sanity += 20;
     return specialItemExpo[9];
   } else if (item === "k") {
     playRandomItemSound();
@@ -315,7 +325,6 @@ Level.prototype.itemPickUp = function(item){
     console.log("Picked up battery");
     console.log(batteries);
   }
-
 };
 
 Level.prototype.insertItems = function(origin) {
