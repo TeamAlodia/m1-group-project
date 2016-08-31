@@ -260,9 +260,6 @@ Level.prototype.placeExits = function (origin, type) {
   this.mapArray[this.yOrigin][this.xOrigin] = type;
   };
 
-
-
-
 Level.prototype.itemPickUp = function(item, batteries, keys){
   var specialItemExpo = [
     "Water-damaged notebook: A small leatherbound notebook that's definitely seen better days. Nothing in it is legible, but it almost looks like my handwriting...",
@@ -354,8 +351,6 @@ Level.prototype.createShadows = function(onLevel){
   }
 };
 
-//---------- Level creation functions ----------//
-
 //---------- Level display functions ----------//
 
 // Draws only the visible area of the map
@@ -371,10 +366,16 @@ Level.prototype.drawMap = function() {
 
       if(this.visibleArray[y][x] === "@"){
           $("#main_con").append("<span id='player'>@<span>");
-      }else if(this.visibleArray[y][x].match(/#/) !== null){
+      }else if(this.visibleArray[y][x].match(/#/)){
         $("#main_con").append("<span class='block'>#<span>");
-      }else if(this.visibleArray[y][x].match(/B/) !== null){
+      }else if(this.visibleArray[y][x].match(/B/)){
         $("#main_con").append("<span class='block'>#<span>");
+      }else if(this.visibleArray[y][x].match(/[C-L]|A/)){
+        $("#main_con").append("<span class='item'>" + this.visibleArray[y][x] + "<span>");
+      }else if(this.visibleArray[y][x].match(/\^|v/)){
+        $("#main_con").append("<span class='exit'>" + this.visibleArray[y][x] + "<span>");
+      }else if(this.visibleArray[y][x].match(/b|k/)){
+        $("#main_con").append("<span class='consumable'>" + this.visibleArray[y][x] + "<span>");
       }else{
         $("#main_con").append("<span class='unlit'>" + this.visibleArray[y][x] + "</span>");
       }
