@@ -15,7 +15,10 @@ new Audio("media/vo_item_9.mp3"),
 new Audio("media/vo_item_10.mp3"),
 new Audio("media/vo_normal_item_0.mp3"),
 new Audio("media/vo_normal_item_1.mp3"),
-new Audio("media/vo_normal_item_2.mp3")
+new Audio("media/vo_normal_item_2.mp3"),
+new Audio("media/shadow_dealdamage.mp3"),
+new Audio("media/shadow_dissolve.mp3"),
+new Audio("media/shadow_takedamage.mp3")
 ];
 
 function playSound(newSoundID) {
