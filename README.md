@@ -43,6 +43,26 @@
     -stepping on ladders takes you up a level
     -stepping on hatches takes you down a level (no hatches on first level)
 
+  2. Scripts.js
+
+  Redraw's the player's HUD (Heads Up Display) after every move to update the following information:
+
+   Sanity:
+   - Set sanity meter on as empty string, adds one "/" for every 5 sanity
+    - writes correct number of "/" to sanity HUD
+  - Sanity HUD is normally green, if sanity power gets below 20 the sanity HUD changes to red
+
+   Flashlight:
+   - Set flashlight meter on as empty string, adds one "/" for every 5 power
+    - writes correct number of "/" to flashlight HUD
+    - set function that subtracts 1 flashlight power per move when the flashlight is set to "on", 2 flashlight power per move when flashlight is set to "high"
+  - Flashlight HUD is normally green, if flashlight power gets below 20 the flashlight HUD changes to red
+
+
+   Keys/Batteries/Level:
+   - Writes keys, batteries, and current level to screen
+
+   Press H for help
 
   -LOS
   -item Generation
