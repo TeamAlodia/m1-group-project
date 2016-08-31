@@ -17,7 +17,7 @@ function drawHUD(expoOutput) {
   // var yCoord = vaultArray[currentVault].playerY
   //
   if(expoOutput){
-    $("#log").append("<li class='lit' id='expo'>" + expoOutput + "</li>");
+    $("#log").text(expoOutput);
   }
   // $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
   $("#items").text("Keys: " + keys + " Batteries: " + batteries + " Level: " + (parseInt(currentLevel) + 1));
@@ -71,10 +71,22 @@ function updateFlashlight() {
 
 }
 
+function gameOver(){
+  drawHUD("Shit's gone South. Press 'spacebar' to restart.");
+
+  if(event.keyCode === 32) {
+    location.reload();
+  }
+}
+
 // Links keyboard input with actions: currently just movement
 function turnLogic(event){
+  if(sanity <= 0){
+    gameOver();
+    return;
+  }
 
-  if (event.keyCode === 104 ) {
+  if(event.keyCode === 104 ) {
     $("#help").toggle();
     return;
   }
@@ -180,19 +192,10 @@ function turnLogic(event){
 
 };
 
-//press H for help
-// function help() {
-//
-// };
-
 // Always active keyboard input
 window.addEventListener("keypress", turnLogic, false);
 
 // Calls map creation
 window.onload = function () {
-
-  //(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength)
-  // levelArray[0] = new Level(100, 100, 50, 10, 21, 10);
-
   levelArray = initializeLevel(levelArray);
 };
