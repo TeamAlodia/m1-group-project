@@ -659,7 +659,11 @@ Level.prototype.playerMovement = function(checkY, checkX){
     // Moves player up to new level
     if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/\^/g)) {
       currentLevel ++;
-      if (!levelArray[currentLevel]) {
+      if (currentLevel === 3) {
+        // levelArray = initializeLevel(levelArray);
+        currentLevel --;
+        console.log('you win');
+      } else if (!levelArray[currentLevel]) {
         levelArray = initializeLevel(levelArray);
       }
     }
