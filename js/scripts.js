@@ -133,7 +133,7 @@ function turnLogic(event){
       levelArray[currentLevel].currentDirection = "se";
       levelArray[currentLevel].playerMovement(1, 1);
     }else if (event.keyCode === 104 ) {
-    console.log("here's how you play");
+      $("#help").toggle();  
     }
   }
 

@@ -15,20 +15,35 @@
   </head>
   <body>
     <audio src="media/bgm.mp3" autoplay loop></audio>
-    <div class="row">
-      <div class="col-sm-6">
-        <div id="main_con" class="container">
+    <div class="container">
+      <div class="row">
+        <div class="col-sm-6">
+          <div id="main_con" class="container">
+          </div>
+          <div class="lit" id="help">
+            <ul class="list-unstyled">
+              <li>Q: Move Northwest</li>
+              <li>W: Move North</li>
+              <li>E: Move Northeast</li>
+              <li>A: Move West</li>
+              <li>D: Move East</li>
+              <li>Z: Move Southwest</li>
+              <li>X: Move South</li>
+              <li>C: Move Southeast</li>
+              <li>S: Toggle flashlight</li>
+            </ul>
+          </div>
         </div>
-      </div>
-      <div class="col-sm-6">
-        <div class = "lit" id="HUD_con">
+        <div class="col-sm-6">
+          <div class = "lit" id="HUD_con">
+          </div>
+          <span class = "lit" id="items"></span>
+          <br>
+          <span class="lit" id="helpText"></span>
+          <p class = "lit">Event Log</p>
+          <ul id="log">
+          </ul>
         </div>
-        <span class = "lit" id="items"></span>
-        <br>
-        <span class="lit" id="helpText"></span>
-        <p class = "lit">Event Log</p>
-        <ul id="log">
-        </ul>
       </div>
     </div>
   </body>
