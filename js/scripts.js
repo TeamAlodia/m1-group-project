@@ -28,33 +28,33 @@ function drawHUD(expoOutput) {
     flashlightMeter += "/";
   }
 
-  $("#HUD_con").text("<span id='HUD_flashlight'>Flashlight:</span><span id='HUD_flashlight_meter'> " + flashlightMeter + "</span><br><br>");
+  $("#HUD_flashlight").text("Flashlight: " + flashlightMeter);
 
   if(flashlightPower/5 <=4){
-    $("#HUD_flashlight_meter").css("color", "red");
+    $("#HUD_flashlight").css("color", "red");
   }else{
-    $("#HUD_flashlight_meter").css("color", "#00e600");
+    $("#HUD_flashlight").css("color", "#00e600");
   }
 
-  if(flashlightState === "on"){
-    $("#HUD_flashlight").css("color", "#00e600");
-  }else if(flashlightState === "high"){
-    $("#HUD_flashlight").css("color", "white");
-  }else {
-    $("#HUD_flashlight").css("color", "green");
-  }
+  // if(flashlightState === "on"){
+  //   $("#HUD_flashlight").css("color", "#00e600");
+  // }else if(flashlightState === "high"){
+  //   $("#HUD_flashlight").css("color", "white");
+  // }else {
+  //   $("#HUD_flashlight").css("color", "green");
+  // }
 
   sanityMeter = "";
   for(var i = 1; i <= sanity/5; ++i){
     sanityMeter += "/";
   }
 
-  $("#HUD_con").text("Sanity: " + sanityMeter);
+  $("#HUD_sanity").text("Sanity: " + sanityMeter);
 
   if(sanity/5 <=4){
-    $("#HUD_sanity_output").css("color", "red");
+    $("#HUD_sanity").css("color", "red");
   }else{
-    $("#HUD_sanity_output").css("color", "#00e600");
+    $("#HUD_sanity").css("color", "#00e600");
   }
 
 
@@ -69,13 +69,6 @@ function updateFlashlight() {
     console.log("Flashlight -2");
   }
 
-  if(flashlightPower <= 0 && batteries > 0){
-    batteries -=1;
-    flashlightPower = 100;
-  }else if(flashlightPower < 0 && batteries === 0){
-    flashlightPower = 0;
-    flashlightState = "off";
-  }
 }
 
 // Links keyboard input with actions: currently just movement
@@ -83,6 +76,13 @@ function turnLogic(event){
 
   currentExpo = "";
   // Flashlight Power Settings
+  if(flashlightPower <= 0 && batteries > 0){
+    batteries -=1;
+    flashlightPower = 100;
+  }else if(flashlightPower < 0 && batteries === 0){
+    flashlightPower = 0;
+    flashlightState = "off";
+  }
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
     flashlightState = "lit";
     console.log("lit")
@@ -135,16 +135,25 @@ function turnLogic(event){
     }
   }
   //sanity/battery adjustment (light condition)
+  if (flashlightPower <= 0) {
+    flashlightState = "off";
+    flashlightPower = 0;
+    console.log("flashlight out of power");
+  }
   if (flashlightState === "superlit"){
     flashlightPower -= 2;
     if (sanity < 100) {
       sanity ++;
+      console.log("sanity +1");
     }
+    console.log("flashlight -2");
   } else if (flashlightState === "lit") {
     flashlightPower --;
     sanity --;
+    console.log("flashlight -1 sanity -1");
   } else {
     sanity -= 2;
+    console.log("sanity -2");
   }
   //sanity/battery adjustment (shadow touch)
 

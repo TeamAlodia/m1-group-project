@@ -260,7 +260,7 @@ Level.prototype.placeExits = function (origin, type) {
   this.mapArray[this.yOrigin][this.xOrigin] = type;
   };
 
-Level.prototype.itemPickUp = function(item, batteries, keys){
+Level.prototype.itemPickUp = function(item){
   var specialItemExpo = [
     "Water-damaged notebook: A small leatherbound notebook that's definitely seen better days. Nothing in it is legible, but it almost looks like my handwriting...",
     "Emergency ration pack: It's a pack of protein bars and bottles of water. I'd forgotten how hungry I was. And thirsty, too.",
@@ -310,7 +310,10 @@ Level.prototype.itemPickUp = function(item, batteries, keys){
     keys += 1;
   } else if (item === "b") {
     playRandomItemSound();
+    console.log(batteries);
     batteries += 1;
+    console.log("Picked up battery");
+    console.log(batteries);
   }
 
 };
@@ -644,7 +647,7 @@ Level.prototype.playerMovement = function(checkY, checkX){
 
   // Picks up item in target space
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k/)){
-    currentExpo = this.itemPickUp(this.mapArray[this.playerY + checkY][this.playerX + checkX], batteries, keys);
+    currentExpo = this.itemPickUp(this.mapArray[this.playerY + checkY][this.playerX + checkX]);
   }
   // Moves player to new space
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k|\./)){
