@@ -57,7 +57,7 @@ function drawHUD(expoOutput) {
     $("#HUD_sanity").css("color", "#00e600");
   }
 
-
+  $("#helpText").text("Press H for help");
 }
 
 function updateFlashlight() {
@@ -73,6 +73,11 @@ function updateFlashlight() {
 
 // Links keyboard input with actions: currently just movement
 function turnLogic(event){
+
+  if (event.keyCode === 104 ) {
+    $("#help").toggle();
+    return;
+  }
 
   currentExpo = "";
   // Flashlight Power Settings
@@ -134,6 +139,7 @@ function turnLogic(event){
       levelArray[currentLevel].playerMovement(1, 1);
     }
   }
+
   //sanity/battery adjustment (light condition)
   if (flashlightPower <= 0) {
     flashlightState = "off";
@@ -174,7 +180,10 @@ function turnLogic(event){
 
 };
 
-
+//press H for help
+// function help() {
+//
+// };
 
 // Always active keyboard input
 window.addEventListener("keypress", turnLogic, false);
