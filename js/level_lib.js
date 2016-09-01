@@ -1,7 +1,6 @@
-var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches, numberOfVaults) {
+var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches) {
   this.playerX;
   this.playerY;
-  this.vaultArray = [];
   this.xOrigin;
   this.yOrigin;
   this.wallList = [];
@@ -26,7 +25,6 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.levelNum = levelNum;
   this.numberOfLadders = numberOfLadders;
   this.numberOfHatches = numberOfHatches;
-  this.numberOfVaults = numberOfVaults
 };
 
 //---------- Level creation functions ----------//
@@ -124,9 +122,6 @@ Level.prototype.createLevel = function() {
   // Updates map with walls
   this.insertWalls();
 
-  // Insert vault entrances
-  this.placeVaults();
-
   // Insert shadows
   this.createShadows(this.levelNum);
 
@@ -140,18 +135,6 @@ Level.prototype.createLevel = function() {
   // Draws map
   this.checkSight();
   this.drawMap();
-};
-
-Level.prototype.placeVaults = function() {
-  var newOrigin;
-
-  for(var i = 0; i <this.numberOfVaults; ++i){
-    do{
-      newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
-    }while(this.mapArray[newOrigin[0]][newOrigin[1]] !== '.');
-
-    this.mapArray[newOrigin[0]][newOrigin[1]] = 'O';
-  }
 };
 
 // Takes in a character, finds all instances of the character in the map and creates a new array with their locations
@@ -195,7 +178,6 @@ Level.prototype.insertWalls = function() {
 
 // Takes in a wall location(origin) composed of an array [[y,x]] and inserts a line of floor (.) of variable length in a variable direction
 Level.prototype.insertTunnel = function(origin) {
-
   this.yOrigin = origin[0];
   this.xOrigin = origin[1];
   var directionArray = ["n","s","e","w"];
@@ -766,8 +748,8 @@ Level.prototype.shadowResolution = function() {
 //---------- Other functions ----------//
 
 function initializeLevel(levelArray) {
-  //new Level parameters(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches, numberOfVaults)
-  levelArray[levelArray.length] = new Level(100, 100, 100, 5, 21, 10,levelArray.length, 2,2, 3);
+  //new Level parameters(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches)
+  levelArray[levelArray.length] = new Level(100, 100, 100, 5, 21, 10,levelArray.length, 2, 2);
   levelArray[levelArray.length - 1].levelNumber = levelArray.length - 1;
   levelArray[levelArray.length - 1].createLevel();
 

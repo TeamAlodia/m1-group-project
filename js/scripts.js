@@ -4,9 +4,6 @@ var flashlightMeter = "";
 var flashlightState = "superlit";
 var sanity = 100;
 var sanityMeter= "";
-var vaultArray = [];
-var currentVault = 0;
-var inVault = false;
 var levelArray = [];
 var currentLevel = 0;
 var currentExpo;
@@ -115,45 +112,30 @@ function turnLogic(event){
     return
   }
 
-  if(inVault){
-    if (event.keyCode === 119){
-      vaultArray[currentVault].movePlayer("n");
-    } else if (event.keyCode === 97){
-      vaultArray[currentVault].movePlayer("w");
-    } else if (event.keyCode === 100){
-      vaultArray[currentVault].movePlayer("e");
-    } else if (event.keyCode === 120){
-      vaultArray[currentVault].movePlayer("s");
-    }
-    updateFlashlight();
-    vaultArray[currentVault].updateSanity();
-    vaultArray[currentVault].drawVault();
-  }else{
-    if (event.keyCode === 119){
-      levelArray[currentLevel].currentDirection = "n";
-      levelArray[currentLevel].playerMovement(-1, 0);
-    } else if (event.keyCode === 97){
-      levelArray[currentLevel].currentDirection = "w";
-      levelArray[currentLevel].playerMovement(0, -1);
-    } else if (event.keyCode === 100){
-      levelArray[currentLevel].currentDirection = "e";
-      levelArray[currentLevel].playerMovement(0, 1);
-    } else if (event.keyCode === 120){
-      levelArray[currentLevel].currentDirection = "s";
-      levelArray[currentLevel].playerMovement(1, 0);
-    }else if (event.keyCode === 113){
-      levelArray[currentLevel].currentDirection = "nw";
-      levelArray[currentLevel].playerMovement(-1, -1);
-    }else if (event.keyCode === 101){
-      levelArray[currentLevel].currentDirection = "ne";
-      levelArray[currentLevel].playerMovement(-1, 1);
-    }else if (event.keyCode === 122){
-      levelArray[currentLevel].currentDirection = "sw";
-      levelArray[currentLevel].playerMovement(1, -1);
-    }else if (event.keyCode === 99){
-      levelArray[currentLevel].currentDirection = "se";
-      levelArray[currentLevel].playerMovement(1, 1);
-    }
+  if (event.keyCode === 119){
+    levelArray[currentLevel].currentDirection = "n";
+    levelArray[currentLevel].playerMovement(-1, 0);
+  } else if (event.keyCode === 97){
+    levelArray[currentLevel].currentDirection = "w";
+    levelArray[currentLevel].playerMovement(0, -1);
+  } else if (event.keyCode === 100){
+    levelArray[currentLevel].currentDirection = "e";
+    levelArray[currentLevel].playerMovement(0, 1);
+  } else if (event.keyCode === 120){
+    levelArray[currentLevel].currentDirection = "s";
+    levelArray[currentLevel].playerMovement(1, 0);
+  }else if (event.keyCode === 113){
+    levelArray[currentLevel].currentDirection = "nw";
+    levelArray[currentLevel].playerMovement(-1, -1);
+  }else if (event.keyCode === 101){
+    levelArray[currentLevel].currentDirection = "ne";
+    levelArray[currentLevel].playerMovement(-1, 1);
+  }else if (event.keyCode === 122){
+    levelArray[currentLevel].currentDirection = "sw";
+    levelArray[currentLevel].playerMovement(1, -1);
+  }else if (event.keyCode === 99){
+    levelArray[currentLevel].currentDirection = "se";
+    levelArray[currentLevel].playerMovement(1, 1);
   }
 
   //sanity/battery adjustment (light condition)
