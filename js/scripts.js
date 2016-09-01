@@ -47,18 +47,15 @@ function drawHUD(expoOutput) {
   }
 
   $("#helpText").text("Press H for help");
-}
+};
 
 function updateFlashlight() {
   if(flashlightState === "on"){
     flashlightPower -= 1;
-    console.log("Flashlight -1");
   }else if(flashlightState === "high"){
     flashlightPower -= 2;
-    console.log("Flashlight -2");
   }
-
-}
+};
 
 function gameOver(){
   drawHUD("You have succumbed to the Shadows. Press 'spacebar' to restart.");
@@ -66,7 +63,7 @@ function gameOver(){
   if(event.keyCode === 32) {
     location.reload();
   }
-}
+};
 
 function gameWin() {
   drawHUD("You escape with your sanity intact. Press 'spacebar' to restart.");
@@ -74,7 +71,7 @@ function gameWin() {
   if(event.keyCode === 32) {
     location.reload();
   }
-}
+};
 
 // Links keyboard input with actions: currently just movement
 function turnLogic(event){
@@ -92,6 +89,7 @@ function turnLogic(event){
   }
 
   currentExpo = "";
+
   // Flashlight Power Settings
   if(flashlightPower <= 0 && batteries > 0){
     batteries -=1;
@@ -102,13 +100,11 @@ function turnLogic(event){
   }
   if(event.keyCode === 115 && flashlightState === "off" && flashlightPower > 0){
     flashlightState = "lit";
-    console.log("lit")
     levelArray[currentLevel].checkSight();
     levelArray[currentLevel].drawMap();
     return
   }else if(event.keyCode === 115 && flashlightState === "lit" && flashlightPower > 0){
     flashlightState = "superlit";
-    console.log("superlit")
     levelArray[currentLevel].checkSight();
     levelArray[currentLevel].drawMap();
     return
@@ -116,7 +112,6 @@ function turnLogic(event){
     flashlightState = "off";
     levelArray[currentLevel].checkSight();
     levelArray[currentLevel].drawMap();
-    console.log("off")
     return
   }
 
@@ -165,24 +160,18 @@ function turnLogic(event){
   if (flashlightPower <= 0) {
     flashlightState = "off";
     flashlightPower = 0;
-    console.log("flashlight out of power");
   }
   if (flashlightState === "superlit"){
     flashlightPower -= 2;
     if (sanity < 100) {
       sanity ++;
-      console.log("sanity +1");
     }
-    console.log("flashlight -2");
   } else if (flashlightState === "lit") {
     flashlightPower --;
     sanity --;
-    console.log("flashlight -1 sanity -1");
   } else {
     sanity -= 2;
-    console.log("sanity -2");
   }
-  //sanity/battery adjustment (shadow touch)
 
   // Draw HUD
   console.log('sanity: '+ sanity + 'battery: '+ flashlightPower);
@@ -193,13 +182,10 @@ function turnLogic(event){
     levelArray[currentLevel].shadowsArray[i].shadowMovement();
   }
 
-
+  // Draw Player Sight and Resolve Shadows
   levelArray[currentLevel].checkSight();
   levelArray[currentLevel].shadowResolution();
-
-  // Draw Player Sight
   levelArray[currentLevel].drawMap();
-
 };
 
 // Always active keyboard input

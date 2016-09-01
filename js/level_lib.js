@@ -27,7 +27,7 @@ var Level = function(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sig
   this.numberOfLadders = numberOfLadders;
   this.numberOfHatches = numberOfHatches;
   this.numberOfVaults = numberOfVaults
-}
+};
 
 //---------- Level creation functions ----------//
 
@@ -92,16 +92,12 @@ Level.prototype.createLevel = function() {
       if(Math.abs(newOrigin[1] - this.playerX) < 11){
         check = false;
       }
-      console.log(newOrigin[0] - this.playerY)
-      console.log(newOrigin[1] - this.playerX)
     }while(check === false);
-    debugger
     this.placeExits(newOrigin,"^");
     for(var y = -1; y <= 1; ++y) {
       for(var x = -1; x <= 1; ++x) {
         if(this.mapArray[newOrigin[0] + y][newOrigin[1] + x] === "#"){
           this.mapArray[newOrigin[0] + y][newOrigin[1] + x] = ".";
-          // this.floorList.push(this.mapArray[newOrigin[0] + y][newOrigin[1] + x]);
         }
       }
     }
@@ -131,10 +127,8 @@ Level.prototype.createLevel = function() {
   // Insert vault entrances
   this.placeVaults();
 
-
   // Insert shadows
   this.createShadows(this.levelNum);
-  console.log("createShadows Executed")
 
   // Inserts player icon.
 
@@ -154,7 +148,7 @@ Level.prototype.placeVaults = function() {
   for(var i = 0; i <this.numberOfVaults; ++i){
     do{
       newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
-    } while(this.mapArray[newOrigin[0]][newOrigin[1]] !== '.');
+    }while(this.mapArray[newOrigin[0]][newOrigin[1]] !== '.');
 
     this.mapArray[newOrigin[0]][newOrigin[1]] = 'O';
   }
@@ -171,7 +165,7 @@ Level.prototype.createIndex = function(char) {
       }
     }
   }
-  return index
+  return index;
 };
 
 // Replaces dirt(X) surrounding floors(.) with walls (#)
@@ -186,9 +180,10 @@ Level.prototype.insertWalls = function() {
 
     for(var y = -1; y <= 1; ++y) {
       for(var x = -1; x <= 1; ++x) {
-        if(currentY + y >= 0 && currentY + y < this.yAxis && currentX + x >= 0 && currentX + x < this.xAxis)
-        if(this.mapArray[currentY + y][currentX + x] === "X"){
-          this.mapArray[currentY + y][currentX + x] = "#";
+        if(currentY + y >= 0 && currentY + y < this.yAxis && currentX + x >= 0 && currentX + x < this.xAxis){
+          if(this.mapArray[currentY + y][currentX + x] === "X"){
+            this.mapArray[currentY + y][currentX + x] = "#";
+          }
         }
       }
     }
@@ -213,33 +208,33 @@ Level.prototype.insertTunnel = function(origin) {
     // Choose a random length of tunnel
     var length =  (Math.floor(Math.random() * (this.hallLengthMax - this.hallLengthMin)) + this.hallLengthMin);
 
-      if(directionArray[direction] === "n" && this.yOrigin-length >=0) {
-        for(var i = 1; i < length + 1; ++i){
-          this.mapArray[this.yOrigin - i][this.xOrigin] = ".";
-        }
-        increment = 5;
-      } else if(directionArray[direction] === "s" && this.yOrigin + length < this.yAxis) {
-        for(var i = 1; i < length + 1; ++i){
-          this.mapArray[this.yOrigin + i][this.xOrigin] = ".";
-        }
-        increment = 5;
-      } else if(directionArray[direction] === "e" && this.xOrigin + length < this.xAxis) {
-        for(var i = 1; i < length + 1; ++i){
-          this.mapArray[this.yOrigin][this.xOrigin + i] = ".";
-        }
-        increment = 5;
-      } else if(this.xOrigin - length >= 0){
-        for(var i = 1; i < length + 1; ++i){
-          this.mapArray[this.yOrigin][this.xOrigin - i] = ".";
-        }
-        increment = 5;
-      } else {
-        increment += 1;
+    if(directionArray[direction] === "n" && this.yOrigin-length >=0) {
+      for(var i = 1; i < length + 1; ++i){
+        this.mapArray[this.yOrigin - i][this.xOrigin] = ".";
       }
-    } while(increment < 5);
+      increment = 5;
+    } else if(directionArray[direction] === "s" && this.yOrigin + length < this.yAxis) {
+      for(var i = 1; i < length + 1; ++i){
+        this.mapArray[this.yOrigin + i][this.xOrigin] = ".";
+      }
+      increment = 5;
+    } else if(directionArray[direction] === "e" && this.xOrigin + length < this.xAxis) {
+      for(var i = 1; i < length + 1; ++i){
+        this.mapArray[this.yOrigin][this.xOrigin + i] = ".";
+      }
+      increment = 5;
+    } else if(this.xOrigin - length >= 0){
+      for(var i = 1; i < length + 1; ++i){
+        this.mapArray[this.yOrigin][this.xOrigin - i] = ".";
+      }
+      increment = 5;
+    } else {
+      increment += 1;
+    }
+  } while(increment < 5);
 
-    // Replace origin wall with dirt.
-    this.mapArray[this.yOrigin][this.xOrigin] = ".";
+  // Replace origin wall with dirt.
+  this.mapArray[this.yOrigin][this.xOrigin] = ".";
 };
 
 // Draws bedrock perimeter around map
@@ -333,10 +328,7 @@ Level.prototype.itemPickUp = function(item){
     keys += 1;
   } else if (item === "b") {
     playRandomItemSound();
-    console.log(batteries);
     batteries += 1;
-    console.log("Picked up battery");
-    console.log(batteries);
   }
 };
 
@@ -358,10 +350,8 @@ Level.prototype.insertSpecial = function() {
 
   for(var i = 0; i < this.itemCatalog.length; ++i){
     newOrigin = this.floorList[(Math.floor(Math.random() * (max)) + 1)];
-
     this.yOrigin = newOrigin[0];
     this.xOrigin = newOrigin[1];
-
     this.mapArray[this.yOrigin][this.xOrigin] = this.itemCatalog[i];
   }
 };
@@ -372,7 +362,6 @@ Level.prototype.createShadows = function(onLevel){
     this.yOrigin = newOrigin[0];
     this.xOrigin = newOrigin[1];
     this.shadowsArray.push(new Shadow(this.yOrigin, this.xOrigin, 2, onLevel));
-    console.log("Shadow Created");
   }
 };
 
@@ -383,12 +372,10 @@ Level.prototype.drawMap = function() {
   $("#main_con").text("");
 
   // Loops through the visible map area
-
   for(var y = 0; y <= this.sightBound; ++y){
     for(var x = 0; x <= this.sightBound; ++x){
 
       //Draws visibleArray with appropriate color markups.
-
       if(this.visibleArray[y][x] === "@"){
           $("#main_con").append("<span id='player'>@<span>");
       }else if(this.visibleArray[y][x].match(/#/)){
@@ -410,18 +397,15 @@ Level.prototype.drawMap = function() {
 };
 
 // Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
-
 Level.prototype.checkSight = function() {
 
   //These variables are what will prevent plot() from checking undefined array locations.
-
   var boundNorth;
   var boundSouth;
   var boundEast;
   var boundWest;
 
-// The following for loops are checking for terminal objects (i.e. level boundaries) in each of the cardinal directions and, upon finding them, setting the boundVar to their relative distance from the player. Otherwise, the boundVar will equal the sightLength
-
+  //The following for loops are checking for terminal objects (i.e. level boundaries) in each of the cardinal directions and, upon finding them, setting the boundVar to their relative distance from the player. Otherwise, the boundVar will equal the sightLength
   for(var i = 0; i >= this.sightLength * -1; --i){
     boundNorth = i;
     if(this.mapArray[this.playerY + i][this.playerX].match(/B/) !== null){
@@ -486,9 +470,8 @@ Level.prototype.checkSight = function() {
   }
 
   // Resets and builds visibleArray at a constant size, and populates it with blank (i.e. invisible) spaces
-
   this.visibleArray = [];
-  this.flashlightPerimeter = this.checkFlashlight(boundNorth, boundSouth, boundEast, boundWest)
+  this.flashlightPerimeter = this.checkFlashlight(boundNorth, boundSouth, boundEast, boundWest);
 
   for(var i = 0; i <= this.sightBound; ++i) {
     this.visibleArray[i] = [];
@@ -498,7 +481,6 @@ Level.prototype.checkSight = function() {
   }
 
   // Checks visible area within allowed boundaries.
-
   this.checkLight = false;
 
   for(var i = 0; i < this.perimeterArray.length ; ++i){
@@ -537,7 +519,6 @@ Level.prototype.checkSight = function() {
   }
 
   for(var i = -1; i > boundWest ; --i){
-
     if(!(this.mapArray[this.playerY][this.playerX + i].match(/#|B/))){
       this.visibleArray[this.sightLength - 1][this.sightLength + i] = this.mapArray[this.playerY - 1][this.playerX + i];
       this.visibleArray[this.sightLength + 1][this.sightLength + i] = this.mapArray[this.playerY + 1][this.playerX + i];
@@ -547,7 +528,6 @@ Level.prototype.checkSight = function() {
   }
 
   for(var i = 0; i < this.shadowsArray.length; ++i){
-
     var shadowY = this.shadowsArray[i].shadowY;
     var shadowX = this.shadowsArray[i].shadowX;
 
@@ -634,7 +614,6 @@ Level.prototype.checkFlashlight = function(boundNorth, boundSouth, boundEast, bo
 };
 
 // Determines the coordinates for drawing a line from x0, y0 to x1,y1. Terminates if plot() returns a false.
-
 Level.prototype.drawline = function(x0,y0,x1,y1,flashlightState){
 	var tmp;
 	var steep = Math.abs(y1-y0) > Math.abs(x1-x0);
@@ -658,7 +637,6 @@ Level.prototype.drawline = function(x0,y0,x1,y1,flashlightState){
   var y = y0;
 
   // Goes down the line's coordinates, starting from the origin. If plot returns a false, drawline() terminates
-
   for(var x=x0;x<=x1;x++){
   	if(!(steep ? this.plot(y,sign*x,flashlightState) : this.plot(sign*x,y,flashlightState))) {
       return;
@@ -672,9 +650,7 @@ Level.prototype.drawline = function(x0,y0,x1,y1,flashlightState){
 };
 
 //Used by drawline to plot the current coordinates. Checks to see if current coordinates are a wall, and if so, sends back a false and terminates drawline(). Automatically populates visibleArray with the matching data in mapArray for the current coordinates regardless of outcome.
-
 Level.prototype.plot = function(x,y,flashlightState){
-
   // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
   var newOrigin;
   if(this.checkLight){
@@ -685,7 +661,6 @@ Level.prototype.plot = function(x,y,flashlightState){
         }
       }
     }
-
     this.visibleArray[this.sightLength+y][this.sightLength+x] = "<span class='" + flashlightState + "'>" +  this.mapArray[this.playerY+y][this.playerX+x] + "<span>";
   }else{
     this.visibleArray[this.sightLength+y][this.sightLength+x] = this.mapArray[this.playerY+y][this.playerX+x];
@@ -701,12 +676,11 @@ Level.prototype.plot = function(x,y,flashlightState){
 //--------------------//
 
 Level.prototype.playerMovement = function(checkY, checkX){
-
-
   // Picks up item in target space
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k/)){
     currentExpo = this.itemPickUp(this.mapArray[this.playerY + checkY][this.playerX + checkX]);
   }
+
   // Moves player to new space
   if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/[C-L]|A|b|k|\./)){
     this.mapArray[this.playerY][this.playerX] = '.';
@@ -718,7 +692,6 @@ Level.prototype.playerMovement = function(checkY, checkX){
     if(this.mapArray[this.playerY + checkY][this.playerX + checkX].match(/\^/g)) {
       currentLevel ++;
       if (currentLevel === 3) {
-        // levelArray = initializeLevel(levelArray);
         currentLevel --;
         winState = "win";
         return;
@@ -731,7 +704,6 @@ Level.prototype.playerMovement = function(checkY, checkX){
       currentLevel --;
     }
   }
-
 };
 
 //---------- Shadow functions ----------//
@@ -777,11 +749,9 @@ Level.prototype.shadowResolution = function() {
         this.shadowsArray[i].shadowY = newOrigin[0];
         this.shadowsArray[i].shadowX = newOrigin[1];
       }
-      console.log("shadow has teleported away");
     } else if(this.shadowsArray[i].shadowY - this.playerY <= 1 && this.shadowsArray[i].shadowY - this.playerY >= -1 && this.shadowsArray[i].shadowX - this.playerX <= 1 && this.shadowsArray[i].shadowX - this.playerX >= -1){
       sanity -= 5;
       playSound(15);
-      console.log("shadow has damaged character " + sanity);
     }
   }
 
@@ -801,7 +771,7 @@ Level.prototype.shadowResolution = function() {
 //---------- Other functions ----------//
 
 function initializeLevel(levelArray) {
-  //(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches, numberOfVaults)
+  //new Level parameters(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches, numberOfVaults)
   levelArray[levelArray.length] = new Level(100, 100, 100, 5, 21, 10,levelArray.length, 2,2, 3);
   levelArray[levelArray.length - 1].levelNumber = levelArray.length - 1;
   levelArray[levelArray.length - 1].createLevel();
