@@ -116,7 +116,6 @@ Level.prototype.createLevel = function() {
         for(var x = -1; x <= 1; ++x) {
           if(this.mapArray[newOrigin[0] + y][newOrigin[1] + x] === "#"){
             this.mapArray[newOrigin[0] + y][newOrigin[1] + x] = ".";
-            // this.floorList.push(this.mapArray[newOrigin[0] + y][newOrigin[1] + x]);
           }
         }
       }
@@ -408,13 +407,6 @@ Level.prototype.drawMap = function() {
     }
   $("#main_con").append("<br>");
   }
-
-  // for(var y = 0; y < this.mapArray.length; ++y){
-  //   for(var x = 0; x < this.mapArray.length; ++x){
-  //     $("#help").append(this.mapArray[y][x]);
-  //   }
-  //   $("#help").append("<br>");
-  // }
 };
 
 // Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
@@ -754,7 +746,6 @@ var Shadow = function(shadowY, shadowX, strength, onLevel){
 }
 
 Shadow.prototype.shadowMovement = function(){
-  // console.log(this.shadowY, this.shadowX);
   if(Math.pow(levelArray[this.onLevel].playerY-this.shadowY,2) + Math.pow(levelArray[this.onLevel].playerX-this.shadowX,2) <= Math.pow(levelArray[this.onLevel].sightLength,2)) {
     if(this.shadowY > levelArray[this.onLevel].playerY){
       this.shadowY -= 1;
@@ -771,7 +762,6 @@ Shadow.prototype.shadowMovement = function(){
 
 Level.prototype.shadowResolution = function() {
   var newOrigin;
-
 
   // Checks to see if any shadows have been hit by flashlight and teleports them if they have been.
   for(var i = 0; i < this.shadowsArray.length; ++i) {
@@ -798,7 +788,7 @@ Level.prototype.shadowResolution = function() {
   // Respawn chance for shadows
   if(this.shadowsArray.length < this.shadowCount) {
     var chance = (this.shadowCount - this.shadowsArray.length);
-    var random = Math.floor(Math.random() * (this.shadowCount - 1)) + 1
+    var random = Math.floor(Math.random() * (this.shadowCount - 1)) + 1;
     if(chance >= random){
       newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
       this.yOrigin = newOrigin[0];

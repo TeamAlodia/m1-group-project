@@ -14,15 +14,11 @@ var currentExpo;
 var winState;
 
 function drawHUD(expoOutput) {
-  // var xCoord = vaultArray[currentVault].playerX
-  // var yCoord = vaultArray[currentVault].playerY
-  //
   if(expoOutput){
     $("#log").text(expoOutput);
   }
-  // $("#HUD_con").append("<span> The light here is " + vaultArray[currentVault].floor[yCoord][xCoord].lightLevel + ".</span><br><br>");
+
   $("#items").text("Keys: " + keys + " | Batteries: " + batteries + " | Level: " + (parseInt(currentLevel) + 1));
-  // $("#HUD_con").text("<span class = 'visible'>Batteries: " + batteries + "</span><br><br>");
 
   flashlightMeter = "";
   for(var i = 1; i <= flashlightPower/5; ++i){
@@ -36,14 +32,6 @@ function drawHUD(expoOutput) {
   }else{
     $("#HUD_flashlight").css("color", "#00e600");
   }
-
-  // if(flashlightState === "on"){
-  //   $("#HUD_flashlight").css("color", "#00e600");
-  // }else if(flashlightState === "high"){
-  //   $("#HUD_flashlight").css("color", "white");
-  // }else {
-  //   $("#HUD_flashlight").css("color", "green");
-  // }
 
   sanityMeter = "";
   for(var i = 1; i <= sanity/5; ++i){
