@@ -20,7 +20,6 @@ new Audio("media/shadow_dealdamage.mp3"),
 new Audio("media/shadow_dissolve.mp3"),
 new Audio("media/shadow_takedamage.mp3")
 ];
-
 function playSound(newSoundID) {
   sfx.forEach(function(fx) {
     if (newSoundID < 15 && !fx.ended) {
@@ -28,15 +27,10 @@ function playSound(newSoundID) {
       fx.currentTime = 0;
     }
   });
+  sfx[newSoundID].volume = 0.4;
   sfx[newSoundID].play();
 }
-
 function playRandomItemSound() {
   var index = Math.floor(Math.random() * 3) + 3;
   playSound(sfx.length - index);
 }
-
-// .play();
-// .pause();
-// .loop() = true;
-// .volume = (more than or less than 1);

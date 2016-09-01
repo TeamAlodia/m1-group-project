@@ -5,48 +5,37 @@ body{
   line-height: 20px;
   font-size: 3em;
 }
-
 .superlit{
   color: #ffffcc;
 }
-
 .lit{
   color: #00e600;
 }
-
-#player_span{
-  color: white;
-}
-
-#player {
-  color: white;
-}
-
 .block{
   color: #ccffcc;
 }
-
 .item{
   color: #d279d2;
 }
-
 .exit{
   color: #b32d00;
 }
-
 .consumable{
   color: #732673;
 }
-
-#door_span{
-  color: green;
-}
-
 .unlit{
   color: black;
   text-shadow: 0 0 5px #ffffe6;
 }
-
+#door_span{
+  color: green;
+}
+#player_span{
+  color: white;
+}
+#player {
+  color: white;
+}
 #help {
   padding-top: 10px;
   display: none;
