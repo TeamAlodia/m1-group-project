@@ -515,7 +515,11 @@ Level.prototype.checkSight = function() {
     var shadowX = this.shadowsArray[i].shadowX;
 
     if(between(shadowY, playerY - sightLength, playerY + sightLength) && between(shadowX, playerX - sightLength, playerX + sightLength)) {
-      this.visibleArray[sightLength + ((shadowY - playerY))][sightLength + ((shadowX - playerX))] = "S";
+      if(this.shadowsArray[i].strength === 2){
+        this.visibleArray[sightLength + ((shadowY - playerY))][sightLength + ((shadowX - playerX))] = "S";
+      }else{
+        this.visibleArray[sightLength + ((shadowY - playerY))][sightLength + ((shadowX - playerX))] = "s";
+      }
     }
   }
 
@@ -641,7 +645,7 @@ Level.prototype.plot = function(x,y,flashlightState){
   // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
   var newOrigin;
   if(this.checkLight){
-    if(this.visibleArray[sightLength+y][sightLength+x] === "S") {
+    if(this.visibleArray[sightLength+y][sightLength+x] === "S" || this.visibleArray[sightLength+y][sightLength+x] === "s") {
       for(var i = 0; i < this.shadowsArray.length; ++i){
         if(this.shadowsArray[i].shadowX === playerX+x && this.shadowsArray[i].shadowY === playerY+y) {
           this.shadowsArray[i].hitThisTurn = true;
