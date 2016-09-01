@@ -78,9 +78,10 @@ Level.prototype.createLevel = function() {
     this.insertItems(newOrigin);
   }
 
-  //insert ladders
+  // Insert ladders
   for(var i = 0; i < this.numberOfLadders; ++i){
     var check;
+    // Makes sure ladders are at least 11 spaces away from the origin point of level.
     do {
       check = true;
       newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
@@ -101,7 +102,7 @@ Level.prototype.createLevel = function() {
     }
   }
 
-  //insert hatch and moves player to it
+  // Insert hatch and moves player to it
   if (levelArray.length > 1) {
     for(var i = 0; i < this.numberOfHatches; ++i){
       newOrigin = this.floorList[(Math.floor(Math.random() * (this.floorList.length-1)) + 1)];
@@ -376,37 +377,42 @@ Level.prototype.drawMap = function() {
 // Checks all sight vectors and populates visibleArray. The line of sight model used is square, and is dependant upon the level boundaries also being square (but not the traversible area of the level.)
 Level.prototype.checkSight = function() {
 
-  //These variables are what will prevent plot() from checking undefined array locations.
+  // Readability variables
+  var playerY = this.playerY;
+  var playerX = this.playerX;
+  var sightLength = this.sightLength;
+
+  // These variables are what will prevent plot() from checking undefined array locations.
   var boundNorth;
   var boundSouth;
   var boundEast;
   var boundWest;
 
-  //The following for loops are checking for terminal objects (i.e. level boundaries) in each of the cardinal directions and, upon finding them, setting the boundVar to their relative distance from the player. Otherwise, the boundVar will equal the sightLength
-  for(var i = 0; i >= this.sightLength * -1; --i){
+  // The following for loops are checking for terminal objects (i.e. level boundaries) in each of the cardinal directions and, upon finding them, setting the boundVar to their relative distance from the player. Otherwise, the boundVar will equal the sightLength
+  for(var i = 0; i >= sightLength * -1; --i){
     boundNorth = i;
-    if(this.mapArray[this.playerY + i][this.playerX].match(/B/) !== null){
+    if(this.mapArray[playerY + i][playerX].match(/B/) !== null){
       break;
     }
   }
 
-  for(var i = 0; i <= this.sightLength; ++i){
+  for(var i = 0; i <= sightLength; ++i){
     boundSouth = i;
-    if(this.mapArray[this.playerY + i][this.playerX].match(/B/) !== null){
+    if(this.mapArray[playerY + i][playerX].match(/B/) !== null){
       break;
     }
   }
 
-  for(var i = 0; i <= this.sightLength; ++i){
+  for(var i = 0; i <= sightLength; ++i){
     boundEast = i;
-    if(this.mapArray[this.playerY][this.playerX + i].match(/B/) !== null){
+    if(this.mapArray[playerY][playerX + i].match(/B/) !== null){
       break;
     }
   }
 
-  for(var i = 0; i >= this.sightLength * -1; --i){
+  for(var i = 0; i >= sightLength * -1; --i){
     boundWest = i;
-    if(this.mapArray[this.playerY][this.playerX + i].match(/B/) !== null){
+    if(this.mapArray[playerY][playerX + i].match(/B/) !== null){
       break;
     }
   }
@@ -469,36 +475,36 @@ Level.prototype.checkSight = function() {
   }
 
   for(var i = -1; i > boundNorth ; --i){
-    if(!(this.mapArray[this.playerY + i][this.playerX].match(/#|B/))){
-      this.visibleArray[this.sightLength + i][this.sightLength - 1] = this.mapArray[this.playerY + i][this.playerX - 1];
-      this.visibleArray[this.sightLength + i][this.sightLength + 1] = this.mapArray[this.playerY + i][this.playerX + 1];
+    if(!(this.mapArray[playerY + i][playerX].match(/#|B/))){
+      this.visibleArray[sightLength + i][sightLength - 1] = this.mapArray[playerY + i][playerX - 1];
+      this.visibleArray[sightLength + i][sightLength + 1] = this.mapArray[playerY + i][playerX + 1];
     }else{
       break;
     }
   }
 
   for(var i = 0; i < boundSouth ; ++i){
-    if(!(this.mapArray[this.playerY + i][this.playerX].match(/#|B/))){
-      this.visibleArray[this.sightLength + i][this.sightLength - 1] = this.mapArray[this.playerY + i][this.playerX - 1];
-      this.visibleArray[this.sightLength + i][this.sightLength + 1] = this.mapArray[this.playerY + i][this.playerX + 1];
+    if(!(this.mapArray[playerY + i][playerX].match(/#|B/))){
+      this.visibleArray[sightLength + i][sightLength - 1] = this.mapArray[playerY + i][playerX - 1];
+      this.visibleArray[sightLength + i][sightLength + 1] = this.mapArray[playerY + i][playerX + 1];
     }else{
       break;
     }
   }
 
   for(var i = 0; i < boundEast ; ++i){
-    if(!(this.mapArray[this.playerY][this.playerX + i].match(/#|B/))){
-      this.visibleArray[this.sightLength - 1][this.sightLength + i] = this.mapArray[this.playerY - 1][this.playerX + i];
-      this.visibleArray[this.sightLength + 1][this.sightLength + i] = this.mapArray[this.playerY + 1][this.playerX + i];
+    if(!(this.mapArray[playerY][playerX + i].match(/#|B/))){
+      this.visibleArray[sightLength - 1][sightLength + i] = this.mapArray[playerY - 1][playerX + i];
+      this.visibleArray[sightLength + 1][sightLength + i] = this.mapArray[playerY + 1][playerX + i];
     }else{
       break;
     }
   }
 
   for(var i = -1; i > boundWest ; --i){
-    if(!(this.mapArray[this.playerY][this.playerX + i].match(/#|B/))){
-      this.visibleArray[this.sightLength - 1][this.sightLength + i] = this.mapArray[this.playerY - 1][this.playerX + i];
-      this.visibleArray[this.sightLength + 1][this.sightLength + i] = this.mapArray[this.playerY + 1][this.playerX + i];
+    if(!(this.mapArray[playerY][playerX + i].match(/#|B/))){
+      this.visibleArray[sightLength - 1][sightLength + i] = this.mapArray[playerY - 1][playerX + i];
+      this.visibleArray[sightLength + 1][sightLength + i] = this.mapArray[playerY + 1][playerX + i];
     }else{
       break;
     }
@@ -508,8 +514,8 @@ Level.prototype.checkSight = function() {
     var shadowY = this.shadowsArray[i].shadowY;
     var shadowX = this.shadowsArray[i].shadowX;
 
-    if(between(shadowY, this.playerY - this.sightLength, this.playerY + this.sightLength) && between(shadowX, this.playerX - this.sightLength, this.playerX + this.sightLength)) {
-      this.visibleArray[this.sightLength + ((shadowY - this.playerY))][this.sightLength + ((shadowX - this.playerX))] = "S";
+    if(between(shadowY, playerY - sightLength, playerY + sightLength) && between(shadowX, playerX - sightLength, playerX + sightLength)) {
+      this.visibleArray[sightLength + ((shadowY - playerY))][sightLength + ((shadowX - playerX))] = "S";
     }
   }
 
@@ -626,23 +632,27 @@ Level.prototype.drawline = function(x0,y0,x1,y1,flashlightState){
   }
 };
 
-//Used by drawline to plot the current coordinates. Checks to see if current coordinates are a wall, and if so, sends back a false and terminates drawline(). Automatically populates visibleArray with the matching data in mapArray for the current coordinates regardless of outcome.
+// Used by drawline to plot the current coordinates. Checks to see if current coordinates are a wall, and if so, sends back a false and terminates drawline(). Automatically populates visibleArray with the matching data in mapArray for the current coordinates regardless of outcome.
 Level.prototype.plot = function(x,y,flashlightState){
+  var playerY = this.playerY;
+  var playerX = this.playerX;
+  var sightLength = this.sightLength;
+
   // sightLength is used as the visibleArray reference in order to keep the visible area centered on the player. mapArray also centers on the player when gathering reference data, but uses their actual position to do so.
   var newOrigin;
   if(this.checkLight){
-    if(this.visibleArray[this.sightLength+y][this.sightLength+x] === "S") {
+    if(this.visibleArray[sightLength+y][sightLength+x] === "S") {
       for(var i = 0; i < this.shadowsArray.length; ++i){
-        if(this.shadowsArray[i].shadowX === this.playerX+x && this.shadowsArray[i].shadowY === this.playerY+y) {
+        if(this.shadowsArray[i].shadowX === playerX+x && this.shadowsArray[i].shadowY === playerY+y) {
           this.shadowsArray[i].hitThisTurn = true;
         }
       }
     }
-    this.visibleArray[this.sightLength+y][this.sightLength+x] = "<span class='" + flashlightState + "'>" +  this.mapArray[this.playerY+y][this.playerX+x] + "<span>";
+    this.visibleArray[sightLength+y][sightLength+x] = "<span class='" + flashlightState + "'>" +  this.mapArray[playerY+y][playerX+x] + "<span>";
   }else{
-    this.visibleArray[this.sightLength+y][this.sightLength+x] = this.mapArray[this.playerY+y][this.playerX+x];
+    this.visibleArray[sightLength+y][sightLength+x] = this.mapArray[playerY+y][playerX+x];
   }
-  if(this.mapArray[this.playerY+y][this.playerX+x] !== "#"){
+  if(this.mapArray[playerY+y][playerX+x] !== "#"){
     return true;
   }
   else{
@@ -695,6 +705,7 @@ var Shadow = function(shadowY, shadowX, strength, onLevel){
 }
 
 Shadow.prototype.shadowMovement = function(){
+  // Checks distance between shadows and player. Shadows will move towards player if within range.
   if(Math.pow(levelArray[this.onLevel].playerY-this.shadowY,2) + Math.pow(levelArray[this.onLevel].playerX-this.shadowX,2) <= Math.pow(levelArray[this.onLevel].sightLength,2)) {
     if(this.shadowY > levelArray[this.onLevel].playerY){
       this.shadowY -= 1;
@@ -726,6 +737,7 @@ Level.prototype.shadowResolution = function() {
         this.shadowsArray[i].shadowY = newOrigin[0];
         this.shadowsArray[i].shadowX = newOrigin[1];
       }
+      // Checks to see if shadows are within one square of player and executes damage if one is.
     } else if(this.shadowsArray[i].shadowY - this.playerY <= 1 && this.shadowsArray[i].shadowY - this.playerY >= -1 && this.shadowsArray[i].shadowX - this.playerX <= 1 && this.shadowsArray[i].shadowX - this.playerX >= -1){
       sanity -= 5;
       playSound(15);
@@ -749,7 +761,7 @@ Level.prototype.shadowResolution = function() {
 
 function initializeLevel(levelArray) {
   //new Level parameters(xAxis, yAxis, complexity, hallLengthMin, hallLengthMax, sightLength, levelNum, numberOfLadders, numberOfHatches)
-  levelArray[levelArray.length] = new Level(100, 100, 100, 5, 21, 10,levelArray.length, 2, 2);
+  levelArray[levelArray.length] = new Level(100, 100, 100, 5, 21, 10,levelArray.length, 1, 1);
   levelArray[levelArray.length - 1].levelNumber = levelArray.length - 1;
   levelArray[levelArray.length - 1].createLevel();
 
