@@ -1,4 +1,3 @@
-var keys = 0;
 var batteries = 0;
 var flashlightPower = 100;
 var flashlightMeter = "";
@@ -18,7 +17,7 @@ function drawHUD(expoOutput) {
     $("#log").text(expoOutput);
   }
 
-  $("#items").text("Keys: " + keys + " | Batteries: " + batteries + " | Level: " + (parseInt(currentLevel) + 1));
+  $("#items").text("Batteries: " + batteries + " | Level: " + (parseInt(currentLevel) + 1));
 
   flashlightMeter = "";
   for(var i = 1; i <= flashlightPower/5; ++i){

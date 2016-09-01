@@ -323,9 +323,6 @@ Level.prototype.itemPickUp = function(item){
     playSound(10);
     sanity += 20;
     return specialItemExpo[9];
-  } else if (item === "k") {
-    playRandomItemSound();
-    keys += 1;
   } else if (item === "b") {
     playRandomItemSound();
     batteries += 1;
@@ -338,8 +335,6 @@ Level.prototype.insertItems = function(origin) {
 
   if((Math.floor(Math.random() * 2) + 1) === 1){
     this.mapArray[this.yOrigin][this.xOrigin] = "b";
-  } else {
-    this.mapArray[this.yOrigin][this.xOrigin] = "k";
   }
 };
 
