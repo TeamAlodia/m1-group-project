@@ -11,6 +11,7 @@ var levelArray = [];
 var currentLevel = 0;
 var currentExpo;
 var winState;
+var introExpo = "It's cold in here. It feels cold and... wrong. I've never been afraid of the dark. But the shadows that surround me seem incomplete somehow. Hungry. Ravenous, even. I have no idea where I am or how I got here, but I know I need to get out.";
 
 function drawHUD(expoOutput) {
   if(expoOutput){
@@ -193,5 +194,6 @@ window.addEventListener("keypress", turnLogic, false);
 // Calls map creation
 window.onload = function () {
   levelArray = initializeLevel(levelArray);
-  drawHUD();
+  playSound(0);
+  drawHUD(introExpo);
 };
