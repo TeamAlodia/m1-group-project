@@ -1,6 +1,7 @@
 # Shadowlight
 
 * by Alaina Traxler Ryan Loos, HK Kahng, Justin Kincaid
+* with voice acting and script editing by Nancy Novotny
 
 ## Description
 
